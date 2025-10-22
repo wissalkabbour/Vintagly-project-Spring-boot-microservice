@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Footer from '../components/Footer';
 
 export default function Register() {
   const [firstName, setFirstName] = useState('');
@@ -181,7 +182,7 @@ export default function Register() {
                 required
               />
               <label htmlFor="terms" className="text-sm text-gray-600">
-                By signing up, you are creating a Flowbite account, and you agree to Vintagly's{' '}
+                By signing up, you are creating a Vintagly account, and you agree to Vintagly's{' '}
                 <a href="#" className="text-[#016B61] hover:underline">Terms of Use</a>
                 {' '}and{' '}
                 <a href="#" className="text-[#016B61] hover:underline">Privacy Policy</a>.
@@ -204,6 +205,7 @@ export default function Register() {
           </p>
         </div>
       </div>
+      
     </div>
   );
 }
