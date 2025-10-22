@@ -1,0 +1,40 @@
+import React, { useEffect, useState } from "react";
+// import { useParams } from "react-router-dom";
+import { getProductById } from "../services/apiProduct";
+import ProductGallery from "../components/ProductGallery";
+import ProductDetails from "../components/ProductDetails";
+import Loader from "../components/Loader";
+
+export default function ProductPage() {
+  // const { id } = useParams();
+  const id = 1;
+  const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    async function fetchProduct() {
+      const data = await getProductById(id);
+      setProduct(data);
+    }
+    fetchProduct();
+  }, [id]);
+
+  if (!product) return <Loader />;
+
+  return (
+    <div className="min-h-screen bg-gray-50 text-gray-900 py-10">
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Galerie */}
+          <div className="md:w-1/2">
+            <ProductGallery images={product.images} />
+          </div>
+
+          {/* Détails */}
+          <div className="md:w-1/2">
+            <ProductDetails product={product} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
