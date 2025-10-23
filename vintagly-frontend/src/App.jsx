@@ -1,12 +1,10 @@
 
-import './App.css'
-
 function App() {
-
   return (
-    <>
-    </>
-  )
+    <div>
+      <Catalogue />
+    </div>
+  );
 }
 
-export default App
+export default App;
