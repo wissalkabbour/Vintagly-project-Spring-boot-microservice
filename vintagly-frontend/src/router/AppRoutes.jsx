@@ -6,13 +6,14 @@ import ProductPage from "../pages/ProductPage";
 
 import Panier from "../components/panier/panier";
 import { Component as Demande } from "../components/demande";
+import Login from "../pages/login";
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 🔹 Route d'inscription */}
         <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
 
         <Route path="/catalogue" element={<Catalogue />} />
         <Route path="/panier" element={<Panier />} />
