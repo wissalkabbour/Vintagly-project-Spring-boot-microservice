@@ -120,14 +120,14 @@ export default function ProductDetails({ product }) {
 
         <button
           onClick={() => alert(`Ajouté au panier: ${quantity} × ${product.nom}`)}
-          className="w-full bg-amber-900 hover:bg-amber-800 text-white font-serif text-lg py-4 rounded-lg shadow-lg transition-all hover:shadow-xl hover:scale-[1.02]"
+          className="w-full bg-[#386860] hover:bg-amber-800 text-white font-serif text-lg py-4 rounded-lg shadow-lg transition-all hover:shadow-xl hover:scale-[1.02]"
         >
           Ajouter au panier
         </button>
 
         <button 
           onClick={() => alert('Ajouté aux favoris!')}
-          className="w-full border-2 border-amber-900 text-amber-900 hover:bg-amber-50 font-serif text-lg py-4 rounded-lg transition-all flex items-center justify-center gap-2"
+          className="w-full border-2 border-[#386860] text-[#386860] hover:bg-amber-50 font-serif text-lg py-4 rounded-lg transition-all flex items-center justify-center gap-2"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -138,7 +138,7 @@ export default function ProductDetails({ product }) {
 
       {/* Informations supplémentaires */}
       <div className="space-y-3 pt-4 border-t-2 border-amber-900/10">
-        <h3 className="text-lg font-serif text-amber-900">Informations produit</h3>
+        <h3 className="text-lg font-serif text-[#386860]">Informations produit</h3>
         <div className="grid grid-cols-1 gap-3 text-sm">
           <div className="flex items-start gap-2">
             <svg className="w-5 h-5 text-amber-700 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
