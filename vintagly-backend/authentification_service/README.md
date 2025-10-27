@@ -1,5 +1,4 @@
 
-```markdown
 # Keycloak Authentication Service
 
 This service integrates Spring Boot with Keycloak for OAuth2 authentication and authorization.
@@ -92,29 +91,6 @@ spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:8080/realm
 
 ### Get Access Token
 
-```bash
-curl -X POST http://localhost:8080/realms/myrealm/protocol/openid-connect/token \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "grant_type=password" \
-  -d "client_id=backend" \
-  -d "client_secret=<key>" \
-  -d "username=tajidimalika@gmail.com" \
-  -d "password=malika"
-```
-
-**Response:**
-```json
-{
-  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "expires_in": 300,
-  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "Bearer"
-}
-```
-
-
-Here's how to configure this request in Postman:
-
 ## Postman Configuration for Getting Access Token
 
 ### Method 1: Using Body (Recommended)
@@ -135,52 +111,11 @@ Here's how to configure this request in Postman:
    |-----|-------|
    | grant_type | password |
    | client_id | backend |
-   | client_secret | wS9nhxLfxtWOjteSOwHgaVAxX18pVOjb |
+   | client_secret | <secret key> |
    | username | tajidimalika@gmail.com |
    | password | malika |
 
 4. **Click Send**
-
----
-
-### Method 2: Using Authorization Tab (Alternative)
-
-1. **Create New Request**
-   - Method: `POST`
-   - URL: `http://localhost:8080/realms/myrealm/protocol/openid-connect/token`
-
-2. **Authorization Tab**
-   - Type: `OAuth 2.0`
-   - Click **"Get New Access Token"**
-   - Configure:
-     - **Token Name**: Keycloak Token
-     - **Grant Type**: `Password Credentials`
-     - **Access Token URL**: `http://localhost:8080/realms/myrealm/protocol/openid-connect/token`
-     - **Client ID**: `backend`
-     - **Client Secret**: `wS9nhxLfxtWOjteSOwHgaVAxX18pVOjb`
-     - **Username**: `tajidimalika@gmail.com`
-     - **Password**: `malika`
-     - **Scope**: (leave empty)
-     - **Client Authentication**: `Send as Basic Auth header`
-
-3. **Click "Request Token"**
-
----
-
-## Expected Response
-
-```json
-{
-    "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJxxx...",
-    "expires_in": 300,
-    "refresh_expires_in": 1800,
-    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJyyy...",
-    "token_type": "Bearer",
-    "not-before-policy": 0,
-    "session_state": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "scope": "email profile"
-}
-```
 
 ---
 
