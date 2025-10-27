@@ -27,6 +27,6 @@ public class Demande {
     private Double prix;
 
     private String etat;
-
+    private String phoneNumber;
     private Long idUtilisateur; // référence vers utilisateur (auth service)
 }
