@@ -47,30 +47,39 @@ public class SecurityConfig {
 
     static class KeycloakRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
         @Override
+        @SuppressWarnings("unchecked")
         public Collection<GrantedAuthority> convert(Jwt jwt) {
             List<GrantedAuthority> authorities = new ArrayList<>();
-            
-            // Extract realm roles
-            Map<String, Object> realmAccess = jwt.getClaim("realm_access");
-            if (realmAccess != null && realmAccess.containsKey("roles")) {
-                List<String> realmRoles = (List<String>) realmAccess.get("roles");
-                authorities.addAll(realmRoles.stream()
-                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                    .collect(Collectors.toList()));
-            }
-            
-            // Extract client roles (resource_access.backend.roles)
-            Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
-            if (resourceAccess != null) {
-                Map<String, Object> backend = (Map<String, Object>) resourceAccess.get("backend");
-                if (backend != null && backend.containsKey("roles")) {
-                    List<String> clientRoles = (List<String>) backend.get("roles");
-                    authorities.addAll(clientRoles.stream()
+
+            try {
+                // Extract realm roles
+                Map<String, Object> realmAccess = jwt.getClaim("realm_access");
+                if (realmAccess != null && realmAccess.get("roles") instanceof List<?>) {
+                    List<String> realmRoles = (List<String>) realmAccess.get("roles");
+                    authorities.addAll(realmRoles.stream()
                         .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                         .collect(Collectors.toList()));
                 }
+
+                // Extract client roles (resource_access.backend.roles)
+                Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
+                if (resourceAccess != null) {
+                    Object backendObj = resourceAccess.get("backend");
+                    if (backendObj instanceof Map) {
+                        Map<String, Object> backend = (Map<String, Object>) backendObj;
+                        if (backend.get("roles") instanceof List<?>) {
+                            List<String> clientRoles = (List<String>) backend.get("roles");
+                            authorities.addAll(clientRoles.stream()
+                                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                                .collect(Collectors.toList()));
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // Log the error in production
+                System.err.println("Error extracting roles from JWT: " + e.getMessage());
             }
-            
+
             return authorities;
         }
     }

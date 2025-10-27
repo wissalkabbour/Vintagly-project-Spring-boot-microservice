@@ -182,3 +182,28 @@ This way, the token is automatically saved and reused across all your protected 
 - PostgreSQL
 - Docker
 
+
+note :
+Assigner les Rôles dans Keycloak
+Étape 1: Créer les Rôles
+
+Ouvrez Keycloak Admin Console: http://localhost:8080
+Sélectionnez votre realm: myrealm
+Allez dans "Realm roles" 
+Cliquez sur "Create role"
+Créez ces rôles:
+
+Role name: admin
+Role name: customer
+
+
+
+Étape 2: Assigner les Rôles à Votre Utilisateur
+
+Allez dans "Users" 
+Cherchez et cliquez sur malika
+Allez dans l'onglet "Role mapping"
+Cliquez sur "Assign role"
+Filtrer par "Filter by realm roles"  very impo dont just search the name of role filter by realm roles first 
+Cochez admin et customer
+Cliquez sur "Assign"
