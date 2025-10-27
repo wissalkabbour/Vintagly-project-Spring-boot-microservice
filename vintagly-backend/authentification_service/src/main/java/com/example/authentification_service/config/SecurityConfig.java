@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class SecurityConfig {
                 .requestMatchers("/public/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("admin")
                 .requestMatchers("/customer/**").hasRole("customer")
+                .requestMatchers("/user/**").authenticated()
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
@@ -46,15 +48,30 @@ public class SecurityConfig {
     static class KeycloakRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
         @Override
         public Collection<GrantedAuthority> convert(Jwt jwt) {
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            
+            // Extract realm roles
             Map<String, Object> realmAccess = jwt.getClaim("realm_access");
-            if (realmAccess == null || !realmAccess.containsKey("roles")) {
-                return List.of();
+            if (realmAccess != null && realmAccess.containsKey("roles")) {
+                List<String> realmRoles = (List<String>) realmAccess.get("roles");
+                authorities.addAll(realmRoles.stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                    .collect(Collectors.toList()));
             }
             
-            List<String> roles = (List<String>) realmAccess.get("roles");
-            return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                .collect(Collectors.toList());
+            // Extract client roles (resource_access.backend.roles)
+            Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
+            if (resourceAccess != null) {
+                Map<String, Object> backend = (Map<String, Object>) resourceAccess.get("backend");
+                if (backend != null && backend.containsKey("roles")) {
+                    List<String> clientRoles = (List<String>) backend.get("roles");
+                    authorities.addAll(clientRoles.stream()
+                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                        .collect(Collectors.toList()));
+                }
+            }
+            
+            return authorities;
         }
     }
 }
