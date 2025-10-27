@@ -1,9 +1,10 @@
 package com.example.panier_service.entity;
-
-
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "panier")
@@ -19,7 +20,12 @@ public class Panier {
 
     private LocalDate dateValidation;
 
-    private String etat;
+    private Boolean etat; //changed type to boolean
 
     private Long idUtilisateur; // référence à un utilisateur du service d’authentification
+
+    @OneToMany(mappedBy = "panier", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<PanierItem> items = new ArrayList<>();
+
 }
