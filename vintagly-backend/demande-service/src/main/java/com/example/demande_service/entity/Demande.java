@@ -20,13 +20,16 @@ public class Demande {
 
     private String description;
 
+    @Column(length = 500)
     private String certificat;
 
     private String historique;
 
     private Double prix;
 
-    private String etat;
+    private EtatDemande etat;
 
-    private Long idUtilisateur; // référence vers utilisateur (auth service)
+    private Long idUtilisateur; 
+    private Era eras;
+
 }

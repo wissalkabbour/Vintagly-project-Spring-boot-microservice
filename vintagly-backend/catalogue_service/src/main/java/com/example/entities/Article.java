@@ -29,4 +29,5 @@ public class Article {
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private java.util.List<Image> images;
+    
 }

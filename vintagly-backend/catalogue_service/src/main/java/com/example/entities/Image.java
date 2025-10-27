@@ -17,4 +17,6 @@ public class Image {
     @ManyToOne
     @JoinColumn(name = "id_article")
     private Article article;
+
+    private Long demandeId;
 }
