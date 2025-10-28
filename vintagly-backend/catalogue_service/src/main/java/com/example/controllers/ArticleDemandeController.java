@@ -9,16 +9,16 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/articles")
 @CrossOrigin(origins = "*")
-public class ArticleController {
+public class ArticleDemandeController {
 
     private final ArticleRepository articleRepository;
 
-    public ArticleController(ArticleRepository articleRepository) {
+    public ArticleDemandeController(ArticleRepository articleRepository) {
         this.articleRepository = articleRepository;
     }
 
     @PostMapping
-    public ResponseEntity<Article> addArticle(@RequestBody Article article) {
+    public ResponseEntity<Article> addArticleDemande(@RequestBody Article article) {
         Article saved = articleRepository.save(article);
         return ResponseEntity.ok(saved);
     }
