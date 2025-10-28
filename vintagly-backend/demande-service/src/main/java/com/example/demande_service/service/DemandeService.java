@@ -5,6 +5,7 @@ import com.example.demande_service.repository.DemandeRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DemandeService {
@@ -21,5 +22,21 @@ public class DemandeService {
 
     public List<Demande> getDemandesByUser(Long idUtilisateur) {
         return repository.findByIdUtilisateur(idUtilisateur);
+    }
+    public Demande getDemandeById(Long id) {
+        Optional<Demande> demande = repository.findById(id);
+        return demande.orElse(null);
+    }
+
+    public Demande updateDemande(Demande demande) {
+        return repository.save(demande);
+    }
+
+    public void deleteDemande(Long id) {
+        repository.deleteById(id);
+    }
+
+    public List<Demande> getAllDemandes() {
+        return repository.findAll();
     }
 }

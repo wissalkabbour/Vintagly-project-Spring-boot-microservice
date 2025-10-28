@@ -14,6 +14,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -156,6 +159,87 @@ public ResponseEntity<Demande> addDemande(
     }
 
     return ResponseEntity.ok(savedDemande);
+}
+
+@PutMapping("/valider/{id}")
+public ResponseEntity<String> validerDemande(
+        @PathVariable Long id,
+        @RequestBody Map<String, Object> updatedFields) {
+
+    // 🔹 1. Récupérer la demande
+    Demande demande = service.getDemandeById(id);
+    if (demande == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Demande non trouvée avec l'ID : " + id);
+    }
+
+    // 🔹 2. Mettre à jour les champs envoyés dans le body
+    if (updatedFields.containsKey("nom")) {
+        demande.setNom((String) updatedFields.get("nom"));
+    }
+    if (updatedFields.containsKey("description")) {
+        demande.setDescription((String) updatedFields.get("description"));
+    }
+    if (updatedFields.containsKey("historique")) {
+        demande.setHistorique((String) updatedFields.get("historique"));
+    }
+    if (updatedFields.containsKey("prix")) {
+        Object prixObj = updatedFields.get("prix");
+        if (prixObj instanceof Number) {
+            demande.setPrix(((Number) prixObj).doubleValue());
+        }
+    }
+
+    // 🔹 3. Changer l’état de la demande
+    demande.setEtat(EtatDemande.ACCEPTEE);
+    service.updateDemande(demande);
+
+    try {
+        RestTemplate restTemplate = new RestTemplate();
+
+        // 🔹 4. Créer un article dans le catalogue-service
+        String urlArticle = "http://localhost:8081/api/articles";
+
+        Map<String, Object> articleData = new HashMap<>();
+        articleData.put("nom", demande.getNom());
+        articleData.put("description", demande.getDescription());
+        articleData.put("prix", demande.getPrix());
+        articleData.put("demandeId", demande.getId());
+
+        ResponseEntity<Map> response = restTemplate.postForEntity(urlArticle, articleData, Map.class);
+
+        // 🔹 5. Si l’article est bien créé → mettre à jour les images liées
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            Long articleId = Long.valueOf(response.getBody().get("id").toString());
+
+            String urlUpdateImages = "http://localhost:8081/api/images/updateByDemande/"
+                    + demande.getId() + "/" + articleId;
+
+            restTemplate.put(urlUpdateImages, null);
+        }
+
+        return ResponseEntity.ok("✅ Demande validée avec mise à jour et création d’article réussie");
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("❌ Erreur lors de la validation : " + e.getMessage());
+    }
+}
+
+
+@GetMapping
+public ResponseEntity<?> getAllDemandes() {
+    return ResponseEntity.ok(service.getAllDemandes());
+}
+
+@GetMapping("/{id}")
+public ResponseEntity<Demande> getDemandeById(@PathVariable Long id) {
+    Demande demande = service.getDemandeById(id);
+    if (demande == null) {
+        return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(demande);
 }
 
 }
