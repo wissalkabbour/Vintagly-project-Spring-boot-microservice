@@ -1,35 +1,46 @@
 package com.example.controllers;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.example.entities.Categorie;
-import com.example.repositories.CategorieRepository;
-
+import com.example.services.CategorieService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/api/catalogue/categories")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173") // autorise ton frontend
+@CrossOrigin("*")
 public class CategorieController {
 
-    private final CategorieRepository categorieRepository; // final + constructor automatique
+    private final CategorieService categorieService;
 
-    @GetMapping
-    public List<Categorie> getCategories() {
-        return categorieRepository.findAll();
+    @PostMapping
+    public ResponseEntity<Categorie> addCategorie(@RequestBody Categorie categorie) {
+        return ResponseEntity.ok(categorieService.addCategorie(categorie));
     }
 
-    // @GetMapping("/names")
-    // public List<String> getCategoryNames() {
-    //     return categorieRepository.findAll()
-    //             .stream()
-    //             .map(Categorie::getNom)
-    //             .toList();
-    // }
+    @GetMapping
+    public ResponseEntity<List<Categorie>> getAllCategories() {
+        return ResponseEntity.ok(categorieService.getAllCategories());
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteCategorie(@PathVariable Long id) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            categorieService.deleteCategorie(id);
+            response.put("message", "🗑️ Catégorie supprimée avec succès !");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            response.put("message", "❌ Erreur : " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
 }
