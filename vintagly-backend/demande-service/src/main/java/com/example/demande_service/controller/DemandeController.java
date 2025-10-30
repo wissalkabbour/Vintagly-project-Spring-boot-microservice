@@ -51,7 +51,7 @@ public class DemandeController {
     //     demande.setIdUtilisateur(idUtilisateur);
     //     demande.setEtat(EtatDemande.EN_ATTENTE);
 
-    //     // 📍 Déterminer dynamiquement la racine du microservice
+    //     //  Déterminer dynamiquement la racine du microservice
     //     String decodedPath = URLDecoder.decode(
     //             this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath(),
     //             StandardCharsets.UTF_8
@@ -63,13 +63,13 @@ public class DemandeController {
     //             .getParentFile()  // racine du microservice
     //             .getAbsolutePath();
 
-    //     // 📁 Dossier d’upload
+    //     
     //     File uploadPath = new File(basePath, "src/main/resources/uploads");
     //     if (!uploadPath.exists() && !uploadPath.mkdirs()) {
-    //         throw new IOException("❌ Impossible de créer le dossier d'upload : " + uploadPath.getAbsolutePath());
+    //         throw new IOException(" Impossible de créer le dossier d'upload : " + uploadPath.getAbsolutePath());
     //     }
 
-    //     // 📄 Sauvegarder le certificat
+    //     
     //     if (certificatFile != null && !certificatFile.isEmpty()) {
     //         String cleanFileName = certificatFile.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
     //         String finalFileName = System.currentTimeMillis() + "_" + cleanFileName;
@@ -80,7 +80,7 @@ public class DemandeController {
     //         // chemin relatif pour l'API
     //         demande.setCertificat("/uploads/" + finalFileName);
 
-    //         System.out.println("✅ Fichier enregistré ici : " + certDest.getAbsolutePath());
+    //         System.out.println(" Fichier enregistré ici : " + certDest.getAbsolutePath());
     //     }
 
     //     // Sauvegarde en base
@@ -115,7 +115,7 @@ public ResponseEntity<Demande> addDemande(
     }
 
 
-    // 🔹 2. Stocker le certificat localement
+    //  Stocker le certificat localement
     if (certificatFile != null && !certificatFile.isEmpty()) {
         String decodedPath = URLDecoder.decode(
                 this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath(),
@@ -138,13 +138,13 @@ public ResponseEntity<Demande> addDemande(
         certificatFile.transferTo(certDest);
 
         demande.setCertificat("/uploads/" + finalFileName);
-        System.out.println("✅ Certificat enregistré ici : " + certDest.getAbsolutePath());
+        System.out.println(" Certificat enregistré ici : " + certDest.getAbsolutePath());
     }
 
-    // 🔹 3. Sauvegarder la demande
+    //  Sauvegarder la demande
     Demande savedDemande = service.addDemande(demande);
 
-    // 🔹 4. Envoyer les images au catalogue-service
+    //  Envoyer les images au catalogue-service
     if (imageFiles != null && imageFiles.length > 0) {
         RestTemplate restTemplate = new RestTemplate();
         for (MultipartFile imageFile : imageFiles) {
@@ -175,7 +175,7 @@ public ResponseEntity<String> validerDemande(
         @PathVariable Long id,
         @RequestBody Map<String, Object> updatedFields) {
 
-    // 🔹 1. Récupérer la demande originale
+    //  Récupérer la demande originale
     Demande demande = service.getDemandeById(id);
     if (demande == null) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -229,12 +229,12 @@ public ResponseEntity<String> validerDemande(
             restTemplate.put(urlUpdateImages, null);
         }
 
-        return ResponseEntity.ok("✅ Demande validée et article créé avec succès (avec nouvelles valeurs)");
+        return ResponseEntity.ok(" Demande validée et article créé avec succès (avec nouvelles valeurs)");
 
     } catch (Exception e) {
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("❌ Erreur lors de la validation : " + e.getMessage());
+                .body(" Erreur lors de la validation : " + e.getMessage());
     }
 }
 
