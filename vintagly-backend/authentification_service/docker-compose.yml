@@ -1,6 +1,11 @@
 version: '3.9'
 
 services:
+  eureka-server:
+    build: ../eureka_server
+    ports:
+      - "8761:8761"
+
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.0
     container_name: keycloak
@@ -12,5 +17,33 @@ services:
       - "8080:8080"
     volumes:
       - keycloak_data:/opt/keycloak/data
+
+  auth-service:
+    build: .
+    depends_on:
+      - keycloak
+      - eureka-server
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: auth_user
+      SPRING_DATASOURCE_PASSWORD: dbpass
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      APP_KEYCLOAK_SERVERURL: http://keycloak:8080
+    ports:
+      - "8081:8081"
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: dbpass
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
 volumes:
+  db_data:
   keycloak_data:
