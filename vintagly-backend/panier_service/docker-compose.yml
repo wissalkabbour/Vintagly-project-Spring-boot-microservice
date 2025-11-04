@@ -1,0 +1,27 @@
+services:
+  eureka-server:
+    build: ../eureka_server
+    ports:
+      - "8761:8761"
+
+  panier-service:
+    build: .
+    depends_on:
+      - eureka-server
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/gr8_panier_db
+      SPRING_DATASOURCE_USERNAME: gr8_panier_user
+      SPRING_DATASOURCE_PASSWORD: dbpass
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+    ports:
+      - "8082:8082"
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: gr8_panier_db
+      POSTGRES_USER: gr8_panier_user
+      POSTGRES_PASSWORD: dbpass
+    ports:
+      - "5432:5432"
