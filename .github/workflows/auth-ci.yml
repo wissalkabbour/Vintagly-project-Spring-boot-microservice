@@ -1,0 +1,57 @@
+name: CI - Authentification Service
+
+on:
+  push:
+    branches:
+      - VINTAGLY-WISSAL-AUTHENTIFICATION-SERVICE
+  pull_request:
+    branches:
+      - VINTAGLY-WISSAL-AUTHENTIFICATION-SERVICE
+
+jobs:
+  build-test-and-dockerize:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up JDK 21
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      # 3. Run unit tests
+      - name: Run unit tests
+        run: mvn -f vintagly-backend/authentification_service/pom.xml test
+
+      # 4. Build Auth Service with Maven
+      - name: Build Auth Service with Maven
+        run: mvn -f vintagly-backend/authentification_service/pom.xml clean package -DskipTests
+
+      # 5. Check Docker Compose
+      - name: Check Docker Compose
+        run: docker compose version
+
+      # 6. Build Docker images
+      - name: Build Docker images
+        working-directory: ./vintagly-backend/authentification_service
+        run: docker compose build
+
+      # 7. Run containers (smoke test)
+      - name: Run containers
+        working-directory: ./vintagly-backend/authentification_service
+        run: |
+          docker compose up -d
+          sleep 30
+          docker ps
+          docker compose logs authentification_service
+
+      # 8. Stop containers
+      - name: Stop containers
+        if: always()
+        working-directory: ./vintagly-backend/authentification_service
+        run: docker compose down
