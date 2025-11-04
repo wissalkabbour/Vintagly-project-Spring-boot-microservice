@@ -23,5 +23,10 @@ services:
       POSTGRES_DB: gr8_panier_db
       POSTGRES_USER: gr8_panier_user
       POSTGRES_PASSWORD: dbpass
+    volumes:
+      - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+volumes:
+  db_data:
