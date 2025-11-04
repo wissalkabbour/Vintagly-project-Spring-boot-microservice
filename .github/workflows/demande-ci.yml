@@ -23,17 +23,17 @@ jobs:
           java-version: '17'
 
       - name: Build Demande Service with Maven
-        run: mvn -f vintagly-backend/demande_service/pom.xml clean package -DskipTests
+        run: mvn -f vintagly-backend/demande-service/pom.xml clean package -DskipTests
 
       - name: Verify Docker Compose availability
         run: docker compose version
 
       - name: Build Docker images
-        working-directory: ./vintagly-backend/demande_service
+        working-directory: ./vintagly-backend/demande-service
         run: docker compose build
 
       - name: Run containers (smoke test)
-        working-directory: ./vintagly-backend/demande_service
+        working-directory: ./vintagly-backend/demande-service
         run: |
           docker compose up -d
           sleep 30
@@ -42,5 +42,5 @@ jobs:
 
       - name: Stop containers
         if: always()
-        working-directory: ./vintagly-backend/demande_service
+        working-directory: ./vintagly-backend/demande-service
         run: docker compose down
