@@ -3,10 +3,10 @@ name: CI - Panier Service
 on:
   push:
     branches:
-      - VINTAGLY-WISSAL-SERVICES-CI
+      - VINTAGLY-WISSAL-PANIER-SERVICE
   pull_request:
     branches:
-      - VINTAGLY-WISSAL-SERVICES-CI
+      - VINTAGLY-WISSAL-PANIER-SERVICE
 
 jobs:
   build-and-dockerize:
