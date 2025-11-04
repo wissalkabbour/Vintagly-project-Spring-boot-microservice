@@ -5,7 +5,7 @@ import Catalogue from "../pages/Catalogue";
 import ProductPage from "../pages/ProductPage";
 
 import Panier from "../components/panier/panier";
-import { Component as Demande } from "../components/demande";
+import Demande from "../components/demande";
 import Login from "../pages/login";
 
 const AppRoutes = () => {

@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -20,13 +22,16 @@ public class Article {
     private String certificat;
     private String historique;
     private Double prix;
-
+    private String productLifecycle;
     private Long idVendeur; 
 
     @ManyToOne
+
     @JoinColumn(name = "id_categorie")
+    @JsonBackReference
     private Categorie categorie;
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private java.util.List<Image> images;
+    
 }

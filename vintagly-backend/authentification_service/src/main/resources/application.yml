@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: authentification_service
+
+  server:
+    port: 8081
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/Auth-DB
+    username: postgres
+    password: tajidi180903
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  servlet:
+    multipart:
+      enabled: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/myrealm
+          # jwk-set-uri: http://localhost:8080/realms/myrealm/protocol/openid-connect/certs
+
+app:
+  keycloak:
+    admin:
+      clientId: backend
+      clientSecret: wS9nhxLfxtWOjteSOwHgaVAxX18pVOjb
+    realm: myrealm
+    serverUrl: http://localhost:8080
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
