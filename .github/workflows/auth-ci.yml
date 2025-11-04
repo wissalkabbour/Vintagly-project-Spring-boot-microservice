@@ -3,10 +3,10 @@ name: CI - Authentification Service
 on:
   push:
     branches:
-      - VINTAGLY-WISSAL-AUTHENTIFICATION-SERVICE
+      - VINTAGLY-WISSAL-SERVICES-CI
   pull_request:
     branches:
-      - VINTAGLY-WISSAL-AUTHENTIFICATION-SERVICE
+      - VINTAGLY-WISSAL-SERVICES-CI
 
 jobs:
   build-test-and-dockerize:
