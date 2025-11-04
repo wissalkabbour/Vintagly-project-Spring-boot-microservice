@@ -1,0 +1,17 @@
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.1">
+    <persistence-unit name="myPU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <properties>
+            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/db_gestion_academique"/>
+            <property name="jakarta.persistence.jdbc.user" value="postgres"/>
+            <property name="jakarta.persistence.jdbc.password" value="wiss123ALkb"/>
+
+            <!-- Prevent altering your schema -->
+            <property name="jakarta.persistence.schema-generation.database.action" value="none"/>
+
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+        </properties>
+    </persistence-unit>
+</persistence>
