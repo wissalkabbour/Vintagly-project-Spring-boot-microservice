@@ -3,9 +3,9 @@ spring:
     name: catalogue_service
 
   datasource:
-    url: jdbc:postgresql://ep-curly-tooth-a80fflxw-pooler.eastus2.azure.neon.tech:5432/grp8_catalogue_db
-    username: neondb_owner
-    password: npg_UsfeHkAmX5w7
+    url: jdbc:postgresql://localhost:5432/gr8_catalogue_db
+    username: gr8_catalogue_user
+    password: dbpass
     driver-class-name: org.postgresql.Driver
 
   jpa:

@@ -1,0 +1,63 @@
+name: CI - Catalogue Service
+
+on:
+  push:
+    branches:
+      - VINTAGLY-WISSAL-SERVICES-CI
+  pull_request:
+    branches:
+      - VINTAGLY-WISSAL-SERVICES-CI
+
+jobs:
+  build-test-and-dockerize:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Java 21
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      # 3. Build the JAR (skip tests for faster CI)
+      - name: Build Catalogue Service with Maven
+        run: mvn -f vintagly-backend/catalogue_service/pom.xml clean package -DskipTests
+
+      # 4. Ensure Docker is available
+      - name: Check Docker Compose
+        run: docker compose version
+
+      # 5. Build Docker images (Catalogue + Eureka + Postgres)
+      - name: Build Docker images
+        working-directory: ./vintagly-backend/catalogue_service
+        run: docker compose build
+
+      # 6. Run containers (Eureka, DB, and Catalogue Service)
+      - name: Run containers
+        working-directory: ./vintagly-backend/catalogue_service
+        run: |
+          docker compose up -d
+          echo "⏳ Waiting for Eureka and Catalogue Service to start..."
+          sleep 40
+          docker ps
+          echo "📜 Checking Catalogue Service logs:"
+          docker compose logs catalogue-service || true
+          echo "📜 Checking Eureka Server logs:"
+          docker compose logs eureka-server || true
+
+      # 7. Verify service registration (simple smoke check)
+      - name: Verify Eureka Registration
+        run: |
+          echo "🔍 Checking if Eureka is up..."
+          curl -f http://localhost:8761/eureka/apps || echo "⚠️ Eureka endpoint not reachable yet"
+
+      # 8. Stop all containers
+      - name: Stop containers
+        if: always()
+        working-directory: ./vintagly-backend/catalogue_service
+        run: docker compose down

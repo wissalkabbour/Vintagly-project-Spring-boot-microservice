@@ -3,10 +3,10 @@ name: CI - Auth Service (Fast Build)
 on:
   push:
     branches:
-      - VINTAGLY-WISSAL-SERVICES-CI
+      - VINTAGLY-WISSAL-PANIER-SERVICE
   pull_request:
     branches:
-      - VINTAGLY-WISSAL-SERVICES-CI
+      - VINTAGLY-WISSAL-PANIER-SERVICE
 
 jobs:
   build-and-dockerize:
