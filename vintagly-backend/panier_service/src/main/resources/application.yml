@@ -3,9 +3,9 @@ spring:
     name: grp8_panier_service
 
   datasource:
-    url: jdbc:postgresql://148.230.115.143:5432/gr8_panier_db
+    url: jdbc:postgresql://localhost:5432/gr8_panier_db
     username: gr8_panier_user
-    password: admin
+    password: dbpass
     driver-class-name: org.postgresql.Driver
 
   jpa:
