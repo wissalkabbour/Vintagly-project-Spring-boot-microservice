@@ -3,10 +3,10 @@ name: CI - Catalogue Service
 on:
   push:
     branches:
-      - VINTAGLY-WISSAL-SERVICES-CI
+      - VINTAGLY-WISSAL-PANIER-SERVICE
   pull_request:
     branches:
-      - VINTAGLY-WISSAL-SERVICES-CI
+      - VINTAGLY-WISSAL-PANIER-SERVICE
 
 jobs:
   build-test-and-dockerize:

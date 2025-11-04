@@ -1,0 +1,46 @@
+name: CI - Demande Service
+
+on:
+  push:
+    branches:
+      - VINTAGLY-WISSAL-SERVICES-CI
+  pull_request:
+    branches:
+      - VINTAGLY-WISSAL-SERVICES-CI
+
+jobs:
+  build-test-and-dockerize:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build Demande Service with Maven
+        run: mvn -f vintagly-backend/demande_service/pom.xml clean package -DskipTests
+
+      - name: Verify Docker Compose availability
+        run: docker compose version
+
+      - name: Build Docker images
+        working-directory: ./vintagly-backend/demande_service
+        run: docker compose build
+
+      - name: Run containers (smoke test)
+        working-directory: ./vintagly-backend/demande_service
+        run: |
+          docker compose up -d
+          sleep 30
+          docker ps
+          docker compose logs demande-service || true
+
+      - name: Stop containers
+        if: always()
+        working-directory: ./vintagly-backend/demande_service
+        run: docker compose down

@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>demande_service</artifactId>
+	<artifactId>gr8_demande_service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Demande Service</name>
 	<description>Microservice de gestion des demandes </description>

@@ -12,12 +12,12 @@
 # server.port=8085
 spring:
   application:
-    name: demande-service
+    name: gr8_demande_service
 
   datasource:
-    url: jdbc:postgresql://ep-delicate-rice-a89bnyyp-pooler.eastus2.azure.neon.tech:5432/grp8_demande_db
-    username: neondb_owner
-    password: npg_YSBE1HXKTzV3
+    url: jdbc:postgresql://db:5432/gr8_demande_db
+    username: gr8_demande_user
+    password: dbpass
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -35,8 +35,8 @@ uploadDir: ${user.dir}/uploads
 
 server:
   port: 8085
-  
+
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka-server:8761/eureka
