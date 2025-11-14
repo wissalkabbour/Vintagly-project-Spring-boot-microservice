@@ -6,6 +6,8 @@ import ProductPage from "../pages/ProductPage";
 
 import Panier from "../components/panier/panier";
 import Demande from "../components/demande";
+import AllDemandes from "../components/AllDemandes";
+
 import Login from "../pages/login";
 
 const AppRoutes = () => {
@@ -21,6 +23,7 @@ const AppRoutes = () => {
         <Route path="/panier" element={<Panier />} />
         <Route path="/demande" element={<Demande />} />
         <Route path="/produit/:id" element={<ProductPage />} />
+        <Route path="/AllDemandes" element={<AllDemandes />} />
 
       </Routes>
     </BrowserRouter>

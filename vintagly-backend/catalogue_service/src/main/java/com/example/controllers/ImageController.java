@@ -74,9 +74,10 @@ public class ImageController {
         return ResponseEntity.ok("Images mises à jour avec l'articleId: " + articleId);
     }
 
-    @GetMapping("/demande/{demandeId}")
-    public ResponseEntity<List<Image>> getImagesByDemande(@PathVariable Long demandeId) {
-        List<Image> images = imageRepository.findByDemandeId(demandeId);
-        return ResponseEntity.ok(images);
-    }
+   @GetMapping("/demande/{demandeId}")
+public ResponseEntity<List<Image>> getImagesByDemande(@PathVariable Long demandeId) {
+    List<Image> images = imageRepository.findByDemandeId(demandeId);
+    return ResponseEntity.ok(images);
+}
+
 }
