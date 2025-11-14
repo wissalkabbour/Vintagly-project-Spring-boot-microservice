@@ -24,12 +24,16 @@ public class Demande {
     private String certificat;
 
     private String historique;
+    private String phone;
+
 
     private Double prix;
 
+    @Enumerated(EnumType.STRING)
     private EtatDemande etat;
 
     private Long idUtilisateur; 
     private Era eras;
+    private Long categorieId;
 
 }

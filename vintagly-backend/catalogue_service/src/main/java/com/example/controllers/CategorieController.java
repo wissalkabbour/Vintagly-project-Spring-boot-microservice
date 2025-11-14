@@ -13,12 +13,12 @@ import com.example.repositories.CategorieRepository;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/api/catalogue/categories")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173") // autorise ton frontend
+@CrossOrigin(origins = "http://localhost:5173") 
 public class CategorieController {
 
-    private final CategorieRepository categorieRepository; // final + constructor automatique
+    private final CategorieRepository categorieRepository; 
 
     @GetMapping
     public List<Categorie> getCategories() {

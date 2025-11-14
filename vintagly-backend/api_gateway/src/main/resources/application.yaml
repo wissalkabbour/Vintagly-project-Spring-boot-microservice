@@ -3,34 +3,36 @@ spring:
     name: api_gateway
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true       # 🔹 Permet de découvrir les services via Eureka
-          lower-case-service-id: true
-      routes:
-        - id: auth-service
-          uri: lb://auth-service
-          predicates:
-            - Path=/auth/**
-        - id: catalogue-service
-          uri: http://localhost:8084
-          predicates:
-            - Path=/catalogue/**
-        - id: panier-service
-          uri: http://localhost:8082
-          predicates:
-            - Path=/panier/**
-        - id: payment-service
-          uri: http://localhost:8083
-          predicates:
-            - Path=/payment/**
-        - id: demande-service
-          uri: http://localhost:8085
-          predicates:
-            - Path=/api/demandes/**
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          routes:
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/auth/**
+            - id: catalogue-service
+              uri: http://localhost:8190
+              predicates:
+                - Path=/api/catalogue/**
+            - id: panier-service
+              uri: http://localhost:8082
+              predicates:
+                - Path=/panier/**
+            - id: payment-service
+              uri: http://localhost:8083
+              predicates:
+                - Path=/payment/**
+            - id: demande-service
+              uri: http://localhost:8191
+              predicates:
+                - Path=/api/demandes/**
 server:
-  port: 8888
+  port: 8195
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://localhost:8196/eureka

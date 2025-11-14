@@ -25,6 +25,8 @@ import org.springframework.util.MultiValueMap;
 
 @RestController
 @RequestMapping("/api/demandes")
+@CrossOrigin(origins = "http://localhost:5173") 
+
 public class DemandeController {
 
     private final DemandeService service;
@@ -92,6 +94,10 @@ public ResponseEntity<Demande> addDemande(
         @RequestParam String nom,
         @RequestParam String description,
         @RequestParam String historique,
+                @RequestParam String phone,
+                                @RequestParam Long categorie,
+
+
         @RequestParam(required = false) Double prix,
         @RequestParam Long idUtilisateur,
         @RequestParam("certificat") MultipartFile certificatFile,
@@ -103,8 +109,11 @@ public ResponseEntity<Demande> addDemande(
     demande.setNom(nom);
     demande.setDescription(description);
     demande.setHistorique(historique);
+    demande.setPhone(phone);
     demande.setPrix(prix);
     demande.setIdUtilisateur(idUtilisateur);
+        demande.setCategorieId(categorie);
+
     demande.setEtat(EtatDemande.EN_ATTENTE);
     if (era!= null && !era.isEmpty()) {
         try {
@@ -148,7 +157,7 @@ public ResponseEntity<Demande> addDemande(
     if (imageFiles != null && imageFiles.length > 0) {
         RestTemplate restTemplate = new RestTemplate();
         for (MultipartFile imageFile : imageFiles) {
-            String url = "http://localhost:8084/api/images/upload";
+            String url = "http://localhost:8195/api/catalogue/images/upload";
 
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("file", new org.springframework.core.io.ByteArrayResource(imageFile.getBytes()) {
@@ -187,7 +196,8 @@ public ResponseEntity<String> validerDemande(
     String articleDescription = updatedFields.containsKey("description") ? (String) updatedFields.get("description") : demande.getDescription();
     String articleHistorique = updatedFields.containsKey("historique") ? (String) updatedFields.get("historique") : demande.getHistorique();
     Double articlePrix = updatedFields.containsKey("prix") ? ((Number) updatedFields.get("prix")).doubleValue() : demande.getPrix();
-    Era articleEra = null;
+    
+    Era articleEra = null  ;
     if (updatedFields.containsKey("era")) {
         try {
             articleEra = Era.valueOf((String) updatedFields.get("era"));
@@ -204,7 +214,7 @@ public ResponseEntity<String> validerDemande(
         RestTemplate restTemplate = new RestTemplate();
 
         // 🔹 4. Créer l'article dans le catalogue-service avec les nouvelles valeurs + certificat
-        String urlArticle = "http://localhost:8084/api/articles";
+        String urlArticle = "http://localhost:8195/api/catalogue/articles";
 
         Map<String, Object> articleData = new HashMap<>();
         articleData.put("nom", articleNom);
@@ -223,7 +233,7 @@ public ResponseEntity<String> validerDemande(
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             Long articleId = Long.valueOf(response.getBody().get("id").toString());
 
-            String urlUpdateImages = "http://localhost:8084/api/images/updateByDemande/"
+            String urlUpdateImages = "http://localhost:8195/api/catalogue/images/updateByDemande/"
                     + demande.getId() + "/" + articleId;
 
             restTemplate.put(urlUpdateImages, null);

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: catalogue_service
+    name: catalogue-service
 
   datasource:
     url: jdbc:postgresql://ep-curly-tooth-a80fflxw-pooler.eastus2.azure.neon.tech:5432/neondb?sslmode=require
@@ -27,8 +27,8 @@ upload:
 
 
 server:
-  port: 8084
+  port: 8190
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://localhost:8196/eureka
