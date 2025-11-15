@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  eureka-server:
+    build: ../eureka_server
+    container_name: eureka_server
+    ports:
+      - "8761:8761"
+
+  postgres:
+    image: postgres:15
+    container_name: demande_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: gr8_demande_db
+      POSTGRES_USER: gr8_demande_user
+      POSTGRES_PASSWORD: dbpass
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_demande_data:/var/lib/postgresql/data
+
+  demande-service:
+    build: .
+    container_name: demande_service
+    depends_on:
+      - eureka-server
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/gr8_demande_db
+      SPRING_DATASOURCE_USERNAME: gr8_demande_user
+      SPRING_DATASOURCE_PASSWORD: dbpass
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+    ports:
+      - "8085:8085"
+
+volumes:
+  pg_demande_data:

@@ -1,0 +1,53 @@
+name: CI - Panier Service
+
+on:
+  push:
+    branches:
+      - VINTAGLY-WISSAL-PANIER-SERVICE
+  pull_request:
+    branches:
+      - VINTAGLY-WISSAL-PANIER-SERVICE
+
+jobs:
+  build-and-dockerize:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up JDK 21
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      # 3. Build Panier Service with Maven
+      - name: Build Panier Service with Maven
+        run: mvn -f vintagly-backend/panier_service/pom.xml clean package -DskipTests
+
+      # 4. Verify Docker Compose is available
+      - name: Check Docker Compose
+        run: docker compose version
+
+      # 5. Build Docker images
+      - name: Build Docker images
+        working-directory: ./vintagly-backend/panier_service
+        run: docker compose build
+
+      # 6. Run containers (smoke test)
+      - name: Run containers
+        working-directory: ./vintagly-backend/panier_service
+        run: |
+          docker compose up -d
+          sleep 25
+          docker ps
+          docker compose logs panier-service
+
+      # 7. Tear down containers
+      - name: Stop containers
+        if: always()
+        working-directory: ./vintagly-backend/panier_service
+        run: docker compose down

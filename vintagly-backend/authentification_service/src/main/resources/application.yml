@@ -1,14 +1,14 @@
 spring:
   application:
-    name: authentification_service
+    name: gr8_authentification_service
 
   server:
     port: 8081
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/Auth-DB
-    username: postgres
-    password: tajidi180903
+    url: jdbc:postgresql://localhost:5432/gr8_auth_db
+    username: gr8_auth_user
+    password: dbpass
 
   jpa:
     properties:

@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  eureka-server:
+    build: ../eureka_server
+    container_name: eureka_server
+    ports:
+      - "8761:8761"
+
+  postgres:
+    image: postgres:15
+    container_name: catalogue_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: gr8_catalogue_db
+      POSTGRES_USER: gr8_catalogue_user
+      POSTGRES_PASSWORD: dbpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_catalogue_data:/var/lib/postgresql/data
+
+  catalogue-service:
+    build: .
+    container_name: catalogue_service
+    depends_on:
+      - eureka-server
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/gr8_catalogue_db
+      SPRING_DATASOURCE_USERNAME: gr8_catalogue_user
+      SPRING_DATASOURCE_PASSWORD: dbpass
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+    ports:
+      - "8084:8084"
+
+volumes:
+  pg_catalogue_data:

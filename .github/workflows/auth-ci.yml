@@ -1,0 +1,53 @@
+name: CI - Auth Service (Fast Build)
+
+on:
+  push:
+    branches:
+      - VINTAGLY-WISSAL-PANIER-SERVICE
+  pull_request:
+    branches:
+      - VINTAGLY-WISSAL-PANIER-SERVICE
+
+jobs:
+  build-and-dockerize:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Java 21
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      # 3. Build Maven project (skip tests to save time)
+      - name: Build Auth Service with Maven
+        run: mvn -f vintagly-backend/authentification_service/pom.xml clean package -DskipTests
+
+      # 4. Verify Docker is available
+      - name: Check Docker Compose
+        run: docker compose version
+
+      # 5. Build Docker images only (no containers run)
+      - name: Build Docker images
+        working-directory: ./vintagly-backend/authentification_service
+        run: docker compose build
+
+      # 6. Optional smoke run (short, to verify Docker works)
+      - name: Smoke test containers
+        working-directory: ./vintagly-backend/authentification_service
+        run: |
+          docker compose up -d
+          sleep 20
+          docker ps
+          docker compose logs auth-service || true
+
+      # 7. Stop and clean up
+      - name: Stop containers
+        if: always()
+        working-directory: ./vintagly-backend/authentification_service
+        run: docker compose down
