@@ -1,6 +1,6 @@
 spring:
   application:
-    name: grp8_panier_service
+    name: grp8-panier-service
 
   datasource:
     url: jdbc:postgresql://localhost:5432/gr8_panier_db

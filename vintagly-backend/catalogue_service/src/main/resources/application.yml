@@ -1,6 +1,6 @@
 spring:
   application:
-    name: catalogue_service
+    name: catalogue-service
 
   datasource:
     url: jdbc:postgresql://localhost:5432/gr8_catalogue_db
