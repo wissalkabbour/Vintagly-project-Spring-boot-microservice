@@ -1,5 +1,6 @@
 package com.example.panier_service.controller;
 
+import com.example.panier_service.dto.PanierResponseDTO;
 import com.example.panier_service.entity.Panier;
 import com.example.panier_service.service.PanierService;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,8 @@ public class PanierController {
     }
 
     @GetMapping("/{panierId}")
-    public Panier getPanier(@PathVariable Long panierId) {
+    public PanierResponseDTO getPanier(@PathVariable Long panierId) {
         return panierService.getPanier(panierId);
     }
+
 }
