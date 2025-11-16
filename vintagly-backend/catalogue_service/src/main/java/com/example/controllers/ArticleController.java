@@ -16,7 +16,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/catalogue/articles")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+
 public class ArticleController {
 
     private final ArticleService articleService;
@@ -31,10 +31,10 @@ public class ArticleController {
             @RequestParam("historique") String historique,
             @RequestParam("prix") Double prix,
             @RequestParam("productLifecycle") String productLifecycle,
-            @RequestParam("idVendeur") Long idVendeur,
+            @RequestParam(value="idVendeur",required = false ) Long idVendeur,
             @RequestParam("categorieId") Long categorieId,
             @RequestParam(value = "certificat", required = false) MultipartFile certificatFile,
-            @RequestParam(value = "images", required = false) List<MultipartFile> images
+            @RequestParam("images") List<MultipartFile> images
     ) {
         Map<String, String> response = new HashMap<>();
         try {
