@@ -22,15 +22,21 @@ spring:
       max-file-size: 10MB
       max-request-size: 20MB
 
-# ❗ PAS BESOIN DE PRECISER static ici
-# ❗ Spring Boot détecte automatiquement static/uploads/
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/myrealm
+          # Si un jour tu as une erreur : uncomment ci-dessous
+          # jwk-set-uri: http://localhost:8080/realms/myrealm/protocol/openid-connect/certs
+
 upload:
   dir: src/main/resources/static/uploads
 
 server:
-  port: 8084
+  port: 8190
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://localhost:8196/eureka

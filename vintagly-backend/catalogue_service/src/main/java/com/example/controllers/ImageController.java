@@ -27,6 +27,7 @@ public class ImageController {
         this.articleRepository = articleRepository;
     }
 
+    
     @PostMapping("/upload")
     public ResponseEntity<Image> uploadImage(
             @RequestParam("file") MultipartFile file,

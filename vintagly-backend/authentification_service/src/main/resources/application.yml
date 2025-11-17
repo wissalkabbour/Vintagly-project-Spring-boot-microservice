@@ -1,19 +1,17 @@
+server:
+  port: 8081
+
 spring:
   application:
     name: gr8_authentification_service
 
-  server:
-    port: 8081
-
   datasource:
-    url: jdbc:postgresql://localhost:5432/gr8_auth_db
-    username: gr8_auth_user
-    password: dbpass
+    url: jdbc:postgresql://localhost:5432/grp8_catalogue_db
+    username: postgres
+    password: 11aminalina
+    driver-class-name: org.postgresql.Driver
 
   jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -27,16 +25,17 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/myrealm
+          # jwk-set-uri could also be used:
           # jwk-set-uri: http://localhost:8080/realms/myrealm/protocol/openid-connect/certs
 
 app:
   keycloak:
     admin:
       clientId: backend
-      clientSecret: wS9nhxLfxtWOjteSOwHgaVAxX18pVOjb
+      clientSecret: NEPnUB9mBcwReLXDdrOeABtbjw4HCAIG
     realm: myrealm
     serverUrl: http://localhost:8080
-
+ 
 eureka:
   client:
     service-url:
