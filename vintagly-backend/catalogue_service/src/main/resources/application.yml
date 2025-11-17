@@ -3,9 +3,9 @@ spring:
     name: catalogue-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/gr8_catalogue_db
-    username: gr8_catalogue_user
-    password: dbpass
+    url: jdbc:postgresql://localhost:5432/grp8_catalogue_db
+    username: postgres
+    password: 11aminalina
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -22,11 +22,19 @@ spring:
       max-file-size: 10MB
       max-request-size: 20MB
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/myrealm
+          # Si un jour tu as une erreur : uncomment ci-dessous
+          # jwk-set-uri: http://localhost:8080/realms/myrealm/protocol/openid-connect/certs
+
 upload:
-  dir: uploads
+  dir: src/main/resources/static/uploads
 
 server:
-  port: 8084
+  port: 8190
 
 eureka:
   client:

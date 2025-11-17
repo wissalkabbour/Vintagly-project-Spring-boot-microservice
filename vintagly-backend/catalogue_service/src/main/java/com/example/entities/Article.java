@@ -23,6 +23,7 @@ public class Article {
     private String historique;
     private Double prix;
     private String productLifecycle;
+    @Column(nullable = true)
     private Long idVendeur; 
 
     @ManyToOne

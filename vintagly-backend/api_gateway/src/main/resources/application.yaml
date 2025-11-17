@@ -1,5 +1,6 @@
 server:
   port: 8195
+  forward-headers-strategy: framework   # 🔥 indispensable pour transférer Authorization
 
 spring:
   application:
@@ -7,6 +8,10 @@ spring:
 
   cloud:
     gateway:
+      default-filters:
+        - TokenRelay                    # 🔥 TRANSFÈRE le token aux microservices
+        - RemoveRequestHeader=Cookie    # 🔒 évite les conflits avec Keycloak
+
       discovery:
         locator:
           enabled: true
@@ -19,9 +24,9 @@ spring:
           predicates:
             - Path=/auth/**
 
-        # ---- CATALOGUE service (protégé automatiquement) ----
+        # ---- CATALOGUE service (protégé) ----
         - id: catalogue-service
-          uri: http://localhost:8084
+          uri: http://localhost:8190
           predicates:
             - Path=/api/catalogue/**
 
@@ -33,17 +38,17 @@ spring:
 
         # ---- PAYMENT service (protégé) ----
         - id: payment-service
-          uri: http://localhost:8083
+          uri: lb://payment-service
           predicates:
             - Path=/payment/**
 
         # ---- DEMANDE service (protégé) ----
         - id: demande-service
-          uri: http://localhost:8085
+          uri: lb://demande-service
           predicates:
             - Path=/api/demandes/**
 
-        # ---- FICHIERS UPLOADS (PUBLICS) ----
+        # ---- UPLOADS (PUBLIC) ----
         - id: catalogue-static-uploads
           uri: http://localhost:8084
           predicates:

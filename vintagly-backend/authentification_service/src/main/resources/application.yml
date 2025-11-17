@@ -35,7 +35,7 @@ app:
       clientSecret: NEPnUB9mBcwReLXDdrOeABtbjw4HCAIG
     realm: myrealm
     serverUrl: http://localhost:8080
-
+ 
 eureka:
   client:
     service-url:
