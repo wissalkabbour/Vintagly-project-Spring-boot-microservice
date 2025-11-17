@@ -7,7 +7,7 @@ import java.util.List;
 public class PanierResponseDTO {
 
     private Long id;
-    private Long idUtilisateur;
+    private String idUtilisateur;
     private Boolean etat;
 
     private List<ArticleDTO> articles;

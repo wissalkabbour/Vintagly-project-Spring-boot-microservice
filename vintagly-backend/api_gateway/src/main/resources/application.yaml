@@ -1,36 +1,63 @@
+server:
+  port: 8195
+
 spring:
   application:
     name: api_gateway
+
   cloud:
     gateway:
       discovery:
         locator:
-          enabled: true       # 🔹 Permet de découvrir les services via Eureka
+          enabled: true
           lower-case-service-id: true
+
       routes:
+        # ---- AUTH service (public) ----
         - id: auth-service
           uri: lb://auth-service
           predicates:
             - Path=/auth/**
+
+        # ---- CATALOGUE service (protégé automatiquement) ----
         - id: catalogue-service
           uri: http://localhost:8084
           predicates:
-            - Path=/catalogue/**
+            - Path=/api/catalogue/**
+
+        # ---- PANIER service (protégé) ----
         - id: panier-service
-          uri: http://localhost:8082
+          uri: lb://grp8-panier-service
           predicates:
-            - Path=/panier/**
+            - Path=/api/paniers/**
+
+        # ---- PAYMENT service (protégé) ----
         - id: payment-service
           uri: http://localhost:8083
           predicates:
             - Path=/payment/**
+
+        # ---- DEMANDE service (protégé) ----
         - id: demande-service
           uri: http://localhost:8085
           predicates:
             - Path=/api/demandes/**
-server:
-  port: 8888
+
+        # ---- FICHIERS UPLOADS (PUBLICS) ----
+        - id: catalogue-static-uploads
+          uri: http://localhost:8084
+          predicates:
+            - Path=/uploads/**
+          filters:
+            - PreserveHostHeader
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/myrealm
+
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://localhost:8196/eureka

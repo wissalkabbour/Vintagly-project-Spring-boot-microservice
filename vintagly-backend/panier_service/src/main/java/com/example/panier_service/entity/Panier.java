@@ -22,7 +22,7 @@ public class Panier {
 
     private Boolean etat; //changed type to boolean
 
-    private Long idUtilisateur; // référence à un utilisateur du service d’authentification
+    private String idUtilisateur; // référence à un utilisateur du service d’authentification
 
     @OneToMany(mappedBy = "panier", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
