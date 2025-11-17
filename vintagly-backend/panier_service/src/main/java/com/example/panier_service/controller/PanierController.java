@@ -2,11 +2,14 @@ package com.example.panier_service.controller;
 
 import com.example.panier_service.dto.PanierResponseDTO;
 import com.example.panier_service.entity.Panier;
+import com.example.panier_service.security.SecurityUtils;
 import com.example.panier_service.service.PanierService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/paniers")
+@PreAuthorize("hasRole('customer')")
 public class PanierController {
 
     private final PanierService panierService;
@@ -15,24 +18,31 @@ public class PanierController {
         this.panierService = panierService;
     }
 
-    @PostMapping("/{userId}")
-    public Panier createPanier(@PathVariable Long userId) {
+    // 🔐 crée un panier pour l'utilisateur connecté (PAS de userId dans l'URL)
+    @PostMapping("/create")
+    public Panier createPanier() {
+        String userId = SecurityUtils.getUserIdFromToken();
         return panierService.createPanier(userId);
     }
 
-    @PostMapping("/{panierId}/articles/{articleId}")
-    public Panier addArticle(@PathVariable Long panierId, @PathVariable Long articleId) {
-        return panierService.addArticle(panierId, articleId);
+    // 🔐 ajoute un article au panier de l'utilisateur connecté
+    @PostMapping("/articles/{articleId}")
+    public Panier addArticle(@PathVariable Long articleId) {
+        String userId = SecurityUtils.getUserIdFromToken();
+        return panierService.addArticle(userId, articleId);
     }
 
-    @DeleteMapping("/{panierId}/articles/{articleId}")
-    public Panier removeArticle(@PathVariable Long panierId, @PathVariable Long articleId) {
-        return panierService.removeArticle(panierId, articleId);
+    // 🔐 supprime un article du panier de l'utilisateur connecté
+    @DeleteMapping("/articles/{articleId}")
+    public Panier removeArticle(@PathVariable Long articleId) {
+        String userId = SecurityUtils.getUserIdFromToken();
+        return panierService.removeArticle(userId, articleId);
     }
 
-    @GetMapping("/{panierId}")
-    public PanierResponseDTO getPanier(@PathVariable Long panierId) {
-        return panierService.getPanier(panierId);
+    // 🔐 récupère le panier de l'utilisateur connecté
+    @GetMapping
+    public PanierResponseDTO getPanier() {
+        String userId = SecurityUtils.getUserIdFromToken();
+        return panierService.getPanier(userId);
     }
-
 }

@@ -13,13 +13,13 @@ public class SecurityConfig {
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
 
         http
-            .csrf(csrf -> csrf.disable())
-            .authorizeExchange(auth -> auth
-                .pathMatchers("/auth/**").permitAll()        // Public
-                .pathMatchers("/uploads/**").permitAll()     // Public images
-                .anyExchange().authenticated()               // Tout le reste nécessite JWT
-            )
-            .oauth2ResourceServer(oauth -> oauth.jwt());     // Validation Keycloak automatique
+                .csrf(csrf -> csrf.disable())
+                .authorizeExchange(auth -> auth
+                        .pathMatchers("/auth/**").permitAll()        // Public
+                        .pathMatchers("/uploads/**").permitAll()     // Public images
+                        .anyExchange().authenticated()               // Tout le reste nécessite JWT
+                )
+                .oauth2ResourceServer(oauth -> oauth.jwt());     // Validation Keycloak automatique
 
         return http.build();
     }

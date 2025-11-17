@@ -31,22 +31,22 @@ public class PanierServiceImpl implements PanierService {
     }
 
     @Override
-    public Panier createPanier(Long userId) {
+    public Panier createPanier(String userId) {
         return panierRepository.findByIdUtilisateurAndEtat(userId, true)
-                .orElseGet(() -> {
-                    Panier panier = Panier.builder()
-                            .idUtilisateur(userId)
-                            .etat(true)
-                            .dateValidation(LocalDate.now())
-                            .build();
-                    return panierRepository.save(panier);
-                });
+                .orElseGet(() -> panierRepository.save(
+                        Panier.builder()
+                                .idUtilisateur(userId)
+                                .etat(true)
+                                .dateValidation(LocalDate.now())
+                                .build()
+                ));
     }
 
     @Override
-    public Panier addArticle(Long panierId, Long articleId) {
-        Panier panier = panierRepository.findById(panierId)
-                .orElseThrow(() -> new RuntimeException("Panier introuvable"));
+    public Panier addArticle(String userId, Long articleId) {
+
+        // get or create user's active panier
+        Panier panier = createPanier(userId);
 
         PanierItem item = PanierItem.builder()
                 .articleId(articleId)
@@ -58,24 +58,28 @@ public class PanierServiceImpl implements PanierService {
     }
 
     @Override
-    public Panier removeArticle(Long panierId, Long articleId) {
-        List<PanierItem> items = panierItemRepository.findByPanierId(panierId);
+    public Panier removeArticle(String userId, Long articleId) {
 
-        items.stream()
-                .filter(i -> i.getArticleId().equals(articleId))
+        Panier panier = panierRepository.findByIdUtilisateurAndEtat(userId, true)
+                .orElseThrow(() -> new RuntimeException("Panier introuvable"));
+
+        panierItemRepository.findByPanierId(panier.getId())
+                .stream()
+                .filter(item -> item.getArticleId().equals(articleId))
                 .findFirst()
                 .ifPresent(panierItemRepository::delete);
 
-        return panierRepository.findById(panierId)
+        // reload from DB
+        return panierRepository.findById(panier.getId())
                 .orElseThrow(() -> new RuntimeException("Panier introuvable"));
     }
 
     @Override
-    public PanierResponseDTO getPanier(Long panierId) {
-        Panier panier = panierRepository.findById(panierId)
+    public PanierResponseDTO getPanier(String userId) {
+
+        Panier panier = panierRepository.findByIdUtilisateurAndEtat(userId, true)
                 .orElseThrow(() -> new RuntimeException("Panier introuvable"));
 
-        // Convert to DTO
         PanierResponseDTO dto = new PanierResponseDTO();
         dto.setId(panier.getId());
         dto.setIdUtilisateur(panier.getIdUtilisateur());
@@ -88,12 +92,9 @@ public class PanierServiceImpl implements PanierService {
             a.setId(response.getId());
             a.setNom(response.getNom());
             a.setPrix(response.getPrix());
-
-            // keep only first image
             if (response.getImages() != null && !response.getImages().isEmpty()) {
                 a.setImage(response.getImages().get(0).getPath());
             }
-
             return a;
         }).toList();
 

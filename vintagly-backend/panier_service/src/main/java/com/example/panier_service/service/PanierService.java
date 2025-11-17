@@ -7,8 +7,12 @@ import com.example.panier_service.entity.PanierItem;
 import java.util.List;
 
 public interface PanierService {
-    Panier createPanier(Long userId);
-    Panier addArticle(Long panierId, Long articleId);
-    Panier removeArticle(Long panierId, Long articleId);
-    PanierResponseDTO getPanier(Long panierId);
+
+    Panier createPanier(String userId);
+
+    Panier addArticle(String userId, Long articleId);
+
+    Panier removeArticle(String userId, Long articleId);
+
+    PanierResponseDTO getPanier(String userId);
 }
