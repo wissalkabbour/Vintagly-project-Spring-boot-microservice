@@ -3,33 +3,37 @@ spring:
     name: api_gateway
   cloud:
     gateway:
-      server:
-        webflux:
-          discovery:
-            locator:
-              enabled: true
-              lower-case-service-id: true
-          routes:
-            - id: auth-service
-              uri: lb://auth-service
-              predicates:
-                - Path=/auth/**
-            - id: catalogue-service
-              uri: http://localhost:8190
-              predicates:
-                - Path=/api/catalogue/**
-            - id: panier-service
-              uri: http://localhost:8082
-              predicates:
-                - Path=/panier/**
-            - id: payment-service
-              uri: http://localhost:8083
-              predicates:
-                - Path=/payment/**
-            - id: demande-service
-              uri: http://localhost:8191
-              predicates:
-                - Path=/api/demandes/**
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**
+        - id: catalogue-service
+          uri: lb://catalogue-service
+          predicates:
+            - Path=/api/catalogue/**
+        - id: catalogue-service-images
+          uri: lb://catalogue-service
+          predicates:
+            - Path=/uploads/**
+          filters:
+            - RewritePath=/uploads/(?<segment>.*),/uploads/${segment}
+        - id: panier-service
+          uri: lb://panier-service
+          predicates:
+            - Path=/api/panier/**
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/payment/**
+        - id: demande-service
+          uri: lb://demande-service
+          predicates:
+            - Path=/api/demandes/**
 server:
   port: 8195
 eureka:

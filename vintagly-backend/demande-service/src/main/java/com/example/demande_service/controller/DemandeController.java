@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ import org.springframework.util.MultiValueMap;
 
 @RestController
 @RequestMapping("/api/demandes")
-@CrossOrigin(origins = "http://localhost:5173") 
+// @CrossOrigin(origins = "*")
 
 public class DemandeController {
 
@@ -35,74 +36,18 @@ public class DemandeController {
         this.service = service;
     }
 
-    // @PostMapping("/add")
-    // public ResponseEntity<Demande> addDemande(
-    //         @RequestParam String nom,
-    //         @RequestParam String description,
-    //         @RequestParam String historique,
-    //         @RequestParam(required = false) Double prix,
-    //         @RequestParam Long idUtilisateur,
-    //         @RequestParam("certificat") MultipartFile certificatFile
-    // ) throws IOException {
-
-    //     Demande demande = new Demande();
-    //     demande.setNom(nom);
-    //     demande.setDescription(description);
-    //     demande.setHistorique(historique);
-    //     demande.setPrix(prix);
-    //     demande.setIdUtilisateur(idUtilisateur);
-    //     demande.setEtat(EtatDemande.EN_ATTENTE);
-
-    //     //  Déterminer dynamiquement la racine du microservice
-    //     String decodedPath = URLDecoder.decode(
-    //             this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath(),
-    //             StandardCharsets.UTF_8
-    //     );
-
-    //     // Remonter jusqu’à la racine du microservice (ex: demande-service)
-    //     String basePath = new File(decodedPath)
-    //             .getParentFile()  // target
-    //             .getParentFile()  // racine du microservice
-    //             .getAbsolutePath();
-
-    //     
-    //     File uploadPath = new File(basePath, "src/main/resources/uploads");
-    //     if (!uploadPath.exists() && !uploadPath.mkdirs()) {
-    //         throw new IOException(" Impossible de créer le dossier d'upload : " + uploadPath.getAbsolutePath());
-    //     }
-
-    //     
-    //     if (certificatFile != null && !certificatFile.isEmpty()) {
-    //         String cleanFileName = certificatFile.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
-    //         String finalFileName = System.currentTimeMillis() + "_" + cleanFileName;
-    //         File certDest = new File(uploadPath, finalFileName);
-
-    //         certificatFile.transferTo(certDest);
-
-    //         // chemin relatif pour l'API
-    //         demande.setCertificat("/uploads/" + finalFileName);
-
-    //         System.out.println(" Fichier enregistré ici : " + certDest.getAbsolutePath());
-    //     }
-
-    //     // Sauvegarde en base
-    //     Demande saved = service.addDemande(demande);
-    //     return ResponseEntity.ok(saved);
-    // }
-    @PostMapping("/add")
+   @PostMapping("/add")
 public ResponseEntity<Demande> addDemande(
         @RequestParam String nom,
         @RequestParam String description,
         @RequestParam String historique,
-                @RequestParam String phone,
-                                @RequestParam Long categorie,
-
-
+        @RequestParam String phone,
+        @RequestParam Long categorie,
         @RequestParam(required = false) Double prix,
         @RequestParam Long idUtilisateur,
         @RequestParam("certificat") MultipartFile certificatFile,
         @RequestParam(value = "images", required = false) MultipartFile[] imageFiles,
- @RequestParam(value = "era", required = false) String era // nom unique Era
+        @RequestParam(value = "era", required = false) String era
 ) throws IOException {
 
     Demande demande = new Demande();
@@ -112,10 +57,10 @@ public ResponseEntity<Demande> addDemande(
     demande.setPhone(phone);
     demande.setPrix(prix);
     demande.setIdUtilisateur(idUtilisateur);
-        demande.setCategorieId(categorie);
-
+    demande.setCategorieId(categorie);
     demande.setEtat(EtatDemande.EN_ATTENTE);
-    if (era!= null && !era.isEmpty()) {
+
+    if (era != null && !era.isEmpty()) {
         try {
             demande.setEras(Era.valueOf(era));
         } catch (IllegalArgumentException e) {
@@ -123,61 +68,69 @@ public ResponseEntity<Demande> addDemande(
         }
     }
 
+    // 1️⃣ Sauvegarder la demande d'abord
+Demande savedDemande = service.addDemande(demande);
 
-    //  Stocker le certificat localement
-    if (certificatFile != null && !certificatFile.isEmpty()) {
-        String decodedPath = URLDecoder.decode(
-                this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath(),
-                StandardCharsets.UTF_8
-        );
+RestTemplate restTemplate = new RestTemplate();
 
-        String basePath = new File(decodedPath)
-                .getParentFile()  // target
-                .getParentFile()  // racine du microservice
-                .getAbsolutePath();
+// 2️⃣ Envoyer le certificat au catalogue-service et récupérer le path
+if (certificatFile != null && !certificatFile.isEmpty()) {
+    String urlCertificat = "http://localhost:8195/api/catalogue/certificats/upload";
 
-        File uploadPath = new File(basePath, "src/main/resources/uploads");
-        if (!uploadPath.exists() && !uploadPath.mkdirs()) {
-            throw new IOException("Impossible de créer le dossier d'upload : " + uploadPath.getAbsolutePath());
+    MultiValueMap<String, Object> bodyCert = new LinkedMultiValueMap<>();
+    bodyCert.add("file", new org.springframework.core.io.ByteArrayResource(certificatFile.getBytes()) {
+        @Override
+        public String getFilename() {
+            return certificatFile.getOriginalFilename();
         }
+    });
+    bodyCert.add("demandeId", savedDemande.getId());
 
-        String cleanFileName = certificatFile.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
-        String finalFileName = System.currentTimeMillis() + "_" + cleanFileName;
-        File certDest = new File(uploadPath, finalFileName);
-        certificatFile.transferTo(certDest);
+    HttpHeaders headersCert = new HttpHeaders();
+    headersCert.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        demande.setCertificat("/uploads/" + finalFileName);
-        System.out.println(" Certificat enregistré ici : " + certDest.getAbsolutePath());
-    }
+    HttpEntity<MultiValueMap<String, Object>> requestEntityCert =
+            new HttpEntity<>(bodyCert, headersCert);
 
-    //  Sauvegarder la demande
-    Demande savedDemande = service.addDemande(demande);
+    // ⭐ Récupération du path retourné par l’API catalogue
+    ResponseEntity<String> responseCert = restTemplate.postForEntity(
+            urlCertificat,
+            requestEntityCert,
+            String.class
+    );
+
+    String certificatPath = responseCert.getBody();
+
+    // ⭐ Mise à jour de la demande avec le path du certificat
+    savedDemande.setCertificat(certificatPath);
+    service.updateDemande(savedDemande);
+}
+
 
     //  Envoyer les images au catalogue-service
     if (imageFiles != null && imageFiles.length > 0) {
-        RestTemplate restTemplate = new RestTemplate();
+        String urlImages = "http://localhost:8195/api/catalogue/images/upload";
         for (MultipartFile imageFile : imageFiles) {
-            String url = "http://localhost:8195/api/catalogue/images/upload";
-
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("file", new org.springframework.core.io.ByteArrayResource(imageFile.getBytes()) {
+            MultiValueMap<String, Object> bodyImg = new LinkedMultiValueMap<>();
+            bodyImg.add("file", new org.springframework.core.io.ByteArrayResource(imageFile.getBytes()) {
                 @Override
                 public String getFilename() {
                     return imageFile.getOriginalFilename();
                 }
             });
-            body.add("demandeId", savedDemande.getId());
+            bodyImg.add("demandeId", savedDemande.getId());
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            HttpHeaders headersImg = new HttpHeaders();
+            headersImg.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-            restTemplate.postForEntity(url, requestEntity, String.class);
+            HttpEntity<MultiValueMap<String, Object>> requestEntityImg = new HttpEntity<>(bodyImg, headersImg);
+            restTemplate.postForEntity(urlImages, requestEntityImg, String.class);
         }
     }
 
     return ResponseEntity.ok(savedDemande);
 }
+
 
 @PutMapping("/valider/{id}")
 public ResponseEntity<String> validerDemande(
@@ -191,7 +144,7 @@ public ResponseEntity<String> validerDemande(
                 .body("Demande non trouvée avec l'ID : " + id);
     }
 
-    // 🔹 2. Préparer les valeurs pour l'article (sans modifier la demande en DB)
+    //  Préparer les valeurs pour l'article (sans modifier la demande en DB)
     String articleNom = updatedFields.containsKey("nom") ? (String) updatedFields.get("nom") : demande.getNom();
     String articleDescription = updatedFields.containsKey("description") ? (String) updatedFields.get("description") : demande.getDescription();
     String articleHistorique = updatedFields.containsKey("historique") ? (String) updatedFields.get("historique") : demande.getHistorique();
@@ -206,14 +159,14 @@ public ResponseEntity<String> validerDemande(
         }
     }
 
-    // 🔹 3. Mettre la demande à l'état ACCEPTÉE
+    //  Mettre la demande à l'état ACCEPTÉE
     demande.setEtat(EtatDemande.ACCEPTEE);
     service.updateDemande(demande);
 
     try {
         RestTemplate restTemplate = new RestTemplate();
 
-        // 🔹 4. Créer l'article dans le catalogue-service avec les nouvelles valeurs + certificat
+        //  Créer l'article dans le catalogue-service avec les nouvelles valeurs + certificat
         String urlArticle = "http://localhost:8195/api/catalogue/articles";
 
         Map<String, Object> articleData = new HashMap<>();
@@ -222,6 +175,13 @@ public ResponseEntity<String> validerDemande(
         articleData.put("prix", articlePrix);
         articleData.put("demandeId", demande.getId());
         articleData.put("certificat", demande.getCertificat());
+        Map<String, Object> categorieObject = new HashMap<>();
+        // La clé attendue est "id", qui sera utilisée par le catalogue-service pour lier la Categorie
+        categorieObject.put("id", demande.getCategorieId());
+
+        articleData.put("categorie", categorieObject);      
+  articleData.put("idVendeur", demande.getIdUtilisateur());
+        articleData.put("dateDePub", LocalDate.now());
         if (articleEra != null) {
             articleData.put("eras", articleEra.name());
         }
@@ -229,7 +189,7 @@ public ResponseEntity<String> validerDemande(
 
         ResponseEntity<Map> response = restTemplate.postForEntity(urlArticle, articleData, Map.class);
 
-        // 🔹 5. Mettre à jour les images liées si l'article est créé
+        //Mettre à jour les images liées si l'article est créé
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             Long articleId = Long.valueOf(response.getBody().get("id").toString());
 
@@ -247,6 +207,23 @@ public ResponseEntity<String> validerDemande(
                 .body(" Erreur lors de la validation : " + e.getMessage());
     }
 }
+@PutMapping("/refuser/{id}")
+public ResponseEntity<String> RejeterDemande(
+        @PathVariable Long id
+        ) {
+
+    //  Récupérer la demande originale
+    Demande demande = service.getDemandeById(id);
+    if (demande == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Demande non trouvée avec l'ID : " + id);
+    }
+        demande.setEtat(EtatDemande.REFUSEE);
+        service.updateDemande(demande);
+        return ResponseEntity.ok(" Demande rejetée avec succès");
+
+}
+
 
 
 @GetMapping

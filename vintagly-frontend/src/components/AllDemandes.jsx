@@ -20,56 +20,57 @@ export default function AdminDemandes() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDemande, setSelectedDemande] = useState(null);
   const [showModal, setShowModal] = useState(false);
-
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedData, setEditedData] = useState({});
 
   const mapCategorie = (id) => {
-  switch(id) {
-    case 1: return "Vêtements";
-    case 2: return "Musique";
-    case 3: return "Meubles";
-    default: return "Autre";
-  }
-};
+    switch(id) {
+      case 1: return "Vêtements";
+      case 2: return "Musique";
+      case 3: return "Meubles";
+      default: return "Autre";
+    }
+  };
 
   useEffect(() => {
     fetchDemandes();
   }, []);
 
   const fetchDemandes = async () => {
-  setLoading(true);
-  try {
-    const data = await getDemandes();
-    const mapped = await Promise.all(data.map(async d => {
-      // Récupérer les images depuis le microservice images
-      const imagesRes = await fetch(`http://localhost:8190/api/catalogue/images/demande/${d.id}`);
-      const images = await imagesRes.json();
+    setLoading(true);
+    try {
+      const data = await getDemandes();
+      const mapped = await Promise.all(data.map(async d => {
+        // Récupérer les images depuis le microservice images
+        const imagesRes = await fetch(`http://localhost:8195/api/catalogue/images/demande/${d.id}`);
+        const images = await imagesRes.json();
 
-      return {
-        id: d.id,
-        businessName: d.nom,
-        email: d.email || "inconnu@example.com",
-        phone: d.phone || "N/A",
-        price: d.prix,
-        description: d.description,
-        historique: d.historique,
-        category: mapCategorie(d.categorieId), // créer une fonction pour transformer l'ID en nom
-        era: d.eras,
-        status: d.etat,
-        createdAt: d.createdAt || new Date().toISOString(),
-        photos: images.length,
-        hasBusinessLicense: d.certificat != null,
-        images: images.map(img => img.path) // tableau des URLs d’images
-      };
-    }));
+        return {
+          id: d.id,
+          businessName: d.nom,
+          email: d.email || "inconnu@example.com",
+          phone: d.phone || "N/A",
+          price: d.prix,
+          description: d.description,
+          historique: d.historique,
+          category: mapCategorie(d.categorieId),
+          era: d.eras,
+          status: d.etat,
+          createdAt: d.createdAt || new Date().toISOString(),
+          photos: images.length,
+          hasBusinessLicense: d.certificat != null,
+          certificat: d.certificat,
+          images: images.map(img => `http://localhost:8195${img.path}`)
+        };
+      }));
 
-    setDemandes(mapped);
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setLoading(false);
-  }
-};
-
+      setDemandes(mapped);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatEra = (era) => {
     return era
@@ -88,6 +89,7 @@ export default function AdminDemandes() {
       minute: '2-digit'
     });
   };
+
   const getStatusBadge = (status) => {
     const styles = {
       EN_ATTENTE: "bg-yellow-100 text-yellow-800 border-yellow-300",
@@ -108,23 +110,80 @@ export default function AdminDemandes() {
     );
   };
 
-  const handleStatusChange = async (demandeId, newStatus) => {
-    // Appel API pour changer le statut
-    console.log(`Changement de statut pour demande ${demandeId}: ${newStatus}`);
-    
-    setDemandes(prev => 
-      prev.map(d => d.id === demandeId ? { ...d, status: newStatus } : d)
-    );
-  };
 
   const openModal = (demande) => {
     setSelectedDemande(demande);
+    setEditedData({
+      nom: demande.businessName,
+      description: demande.description,
+      historique: demande.historique,
+      prix: demande.price,
+      era: demande.era
+    });
     setShowModal(true);
+    setIsEditing(false);
   };
 
   const closeModal = () => {
     setShowModal(false);
     setSelectedDemande(null);
+    setIsEditing(false);
+  };
+
+  const handleEditChange = (field, value) => {
+    setEditedData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleApprove = () => {
+    setIsEditing(true);
+  };
+
+  const handleValidateApproval = async () => {
+    try {
+      console.log('editedData avant envoi au backend:', editedData);
+      const response = await fetch(`http://localhost:8191/api/demandes/valider/${selectedDemande.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editedData)
+      });
+
+      if (response.ok) {
+        alert('✅ Demande validée et article créé avec succès !');
+        closeModal();
+        fetchDemandes();
+      } else {
+        const errorText = await response.text();
+        alert('❌ Erreur lors de la validation : ' + errorText);
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('❌ Erreur lors de la validation : ' + error.message);
+    }
+  };
+
+  const handleRefuse = async () => {
+    try {
+      const response = await fetch(`http://localhost:8191/api/demandes/refuser/${selectedDemande.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (response.ok) {
+        
+        closeModal();
+        fetchDemandes();
+      } else {
+        const errorText = await response.text();
+        alert(' Erreur lors du rejet : ' + errorText);
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert(' Erreur lors du rejet : ' + error.message);
+    }
   };
 
   const filteredDemandes = demandes
@@ -183,7 +242,6 @@ export default function AdminDemandes() {
               <BarChart3 className="w-8 h-8 text-blue-500" />
             </div>
           </div>
-          
           <div className="bg-white rounded-lg shadow p-6 border-t-4 border-yellow-500">
             <div className="flex items-center justify-between">
               <div>
@@ -193,7 +251,6 @@ export default function AdminDemandes() {
               <Clock className="w-8 h-8 text-yellow-500" />
             </div>
           </div>
-          
           <div className="bg-white rounded-lg shadow p-6 border-t-4 border-green-500">
             <div className="flex items-center justify-between">
               <div>
@@ -203,7 +260,6 @@ export default function AdminDemandes() {
               <CheckCircle className="w-8 h-8 text-green-500" />
             </div>
           </div>
-          
           <div className="bg-white rounded-lg shadow p-6 border-t-4 border-red-500">
             <div className="flex items-center justify-between">
               <div>
@@ -230,7 +286,7 @@ export default function AdminDemandes() {
             </div>
             
             <div className="flex gap-2 flex-wrap">
-              {["ALL", "EN_ATTENTE", "ACCEPTEE", "REJECTED"].map((status) => (
+              {["ALL", "EN_ATTENTE", "ACCEPTEE", "REFUSEE"].map((status) => (
                 <button
                   key={status}
                   onClick={() => setFilter(status)}
@@ -335,7 +391,10 @@ export default function AdminDemandes() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
               <div className="bg-[#3d3734] text-white p-6 flex items-center justify-between sticky top-0">
-                <h2 className="text-2xl font-bold">Détails de la demande #{selectedDemande.id}</h2>
+                <h2 className="text-2xl font-bold">
+                  Détails de la demande #{selectedDemande.id}
+                  {isEditing && <span className="ml-3 text-sm bg-blue-600 px-3 py-1 rounded">Mode édition</span>}
+                </h2>
                 <button 
                   onClick={closeModal}
                   className="text-white hover:text-gray-300 text-2xl"
@@ -345,14 +404,40 @@ export default function AdminDemandes() {
               </div>
 
               <div className="p-6">
+                {/* Infos Business */}
                 <div className="grid md:grid-cols-2 gap-6 mb-6">
                   <div>
                     <h3 className="font-semibold text-[#4a6660] mb-2">Informations Business</h3>
                     <div className="space-y-2 text-sm">
-                      <p><strong>Nom:</strong> {selectedDemande.businessName}</p>
+                      <div>
+                        <strong>Nom:</strong>
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editedData.nom}
+                            onChange={(e) => handleEditChange('nom', e.target.value)}
+                            className="ml-2 border border-gray-300 rounded px-2 py-1 w-full mt-1"
+                          />
+                        ) : (
+                          <span className="ml-2">{selectedDemande.businessName}</span>
+                        )}
+                      </div>
                       <p><strong>Email:</strong> {selectedDemande.email}</p>
                       <p><strong>Téléphone:</strong> {selectedDemande.phone}</p>
-                      <p><strong>Prix:</strong> {selectedDemande.price.toFixed(2)} DH</p>
+                      <div>
+                        <strong>Prix:</strong>
+                        {isEditing ? (
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={editedData.prix}
+                            onChange={(e) => handleEditChange('prix', parseFloat(e.target.value))}
+                            className="ml-2 border border-gray-300 rounded px-2 py-1 w-full mt-1"
+                          />
+                        ) : (
+                          <span className="ml-2">{selectedDemande.price.toFixed(2)} DH</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   
@@ -360,7 +445,24 @@ export default function AdminDemandes() {
                     <h3 className="font-semibold text-[#4a6660] mb-2">Détails Produit</h3>
                     <div className="space-y-2 text-sm">
                       <p><strong>Catégorie:</strong> {selectedDemande.category}</p>
-                      <p><strong>Ère:</strong> {formatEra(selectedDemande.era)}</p>
+                      <div>
+                        <strong>Ère:</strong>
+                        {isEditing ? (
+                          <select
+                            value={editedData.era}
+                            onChange={(e) => handleEditChange('era', e.target.value)}
+                            className="ml-2 border border-gray-300 rounded px-2 py-1 w-full mt-1"
+                          >
+                            <option value="PRE_1920S">PRE_1920S</option>
+                            <option value="ERA_1920S_1940S">ERA_1920S_1940S</option>
+                            <option value="ERA_1950S_1960S">ERA_1950S_1960S</option>
+                            <option value="ERA_1970S_1980S">ERA_1970S_1980S</option>
+                            <option value="ERA_1990S">ERA_1990S</option>
+                          </select>
+                        ) : (
+                          <span className="ml-2">{formatEra(selectedDemande.era)}</span>
+                        )}
+                      </div>
                       <p className="flex items-center gap-2">
                         <strong>Photos:</strong> 
                         <Image className="w-4 h-4 inline" />
@@ -382,20 +484,74 @@ export default function AdminDemandes() {
                   </div>
                 </div>
 
+                {/* Description & Historique */}
                 <div className="mb-6">
                   <h3 className="font-semibold text-[#4a6660] mb-2">Description</h3>
-                  <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">
-                    {selectedDemande.description}
-                  </p>
+                  {isEditing ? (
+                    <textarea
+                      value={editedData.description}
+                      onChange={(e) => handleEditChange('description', e.target.value)}
+                      className="w-full text-sm border border-gray-300 rounded p-3 min-h-[80px]"
+                      rows="3"
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">
+                      {selectedDemande.description}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mb-6">
                   <h3 className="font-semibold text-[#4a6660] mb-2">Histoire du produit</h3>
-                  <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">
-                    {selectedDemande.historique}
-                  </p>
+                  {isEditing ? (
+                    <textarea
+                      value={editedData.historique}
+                      onChange={(e) => handleEditChange('historique', e.target.value)}
+                      className="w-full text-sm border border-gray-300 rounded p-3 min-h-[80px]"
+                      rows="3"
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">
+                      {selectedDemande.historique}
+                    </p>
+                  )}
                 </div>
 
+                {/* Photos */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-[#4a6660] mb-2">Photos</h3>
+                  {selectedDemande.images.length === 0 ? (
+                    <p className="text-sm text-gray-600">Aucune image disponible</p>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {selectedDemande.images.map((img, index) => (
+                        <img
+                          key={index}
+                          src={img}
+                          alt={`photo-${index}`}
+                          className="w-full h-32 object-cover rounded shadow-sm"
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Certificat */}
+                {selectedDemande.certificat && (
+                  <div className="mb-6">
+                    <h3 className="font-semibold text-[#4a6660] mb-2">Certificat</h3>
+                    <a 
+                      href={`http://localhost:8195${selectedDemande.certificat}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline"
+                    >
+                      Voir le certificat
+                    </a>
+                  </div>
+                )}
+
+                {/* Statut */}
                 <div className="mb-6">
                   <h3 className="font-semibold text-[#4a6660] mb-2">Statut actuel</h3>
                   <div className="flex items-center gap-4">
@@ -408,26 +564,43 @@ export default function AdminDemandes() {
 
                 {selectedDemande.status === "EN_ATTENTE" && (
                   <div className="flex gap-4">
-                    <button
-                      onClick={() => {
-                        handleStatusChange(selectedDemande.id, "ACCEPTEE");
-                        closeModal();
-                      }}
-                      className="flex-1 bg-green-600 text-white py-3 px-6 rounded hover:bg-green-700 transition duration-200 font-semibold flex items-center justify-center gap-2"
-                    >
-                      <CheckCircle className="w-5 h-5" />
-                      Approuver
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleStatusChange(selectedDemande.id, "REFUSEE");
-                        closeModal();
-                      }}
-                      className="flex-1 bg-red-600 text-white py-3 px-6 rounded hover:bg-red-700 transition duration-200 font-semibold flex items-center justify-center gap-2"
-                    >
-                      <XCircle className="w-5 h-5" />
-                      Rejeter
-                    </button>
+                    {!isEditing ? (
+                      <>
+                        <button
+                          onClick={handleApprove}
+                          className="flex-1 bg-green-600 text-white py-3 px-6 rounded hover:bg-green-700 transition duration-200 font-semibold flex items-center justify-center gap-2"
+                        >
+                          <CheckCircle className="w-5 h-5" />
+                          Approuver
+                        </button>
+                        <button
+                          onClick={() => {
+                          handleRefuse() ,
+                          closeModal();
+                          }}
+                          className="flex-1 bg-red-600 text-white py-3 px-6 rounded hover:bg-red-700 transition duration-200 font-semibold flex items-center justify-center gap-2"
+                        >
+                          <XCircle className="w-5 h-5" />
+                          Rejeter
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={handleValidateApproval}
+                          className="flex-1 bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700 transition duration-200 font-semibold flex items-center justify-center gap-2"
+                        >
+                          <CheckCircle className="w-5 h-5" />
+                          Valider l'approbation
+                        </button>
+                        <button
+                          onClick={() => setIsEditing(false)}
+                          className="flex-1 bg-gray-600 text-white py-3 px-6 rounded hover:bg-gray-700 transition duration-200 font-semibold"
+                        >
+                          Annuler
+                        </button>
+                      </>
+                    )}
                   </div>
                 )}
 
@@ -443,6 +616,7 @@ export default function AdminDemandes() {
             </div>
           </div>
         )}
+
       </div>
     </div>
   );
