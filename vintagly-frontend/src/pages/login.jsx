@@ -1,14 +1,29 @@
 import React, { useState } from 'react';
+import { useAuthStore } from "../store/authStore"; 
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e) => {
+  const [error, setError] = useState("");
+
+  const login = useAuthStore((state) => state.login);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ email, password });
+    setError("");
+
+    const success = await login(email, password);
+    if (!success) {
+      setError("Invalid email or password");
+      return;
+    }
+
+
+    window.location.href = "/";
   };
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -84,6 +99,7 @@ export default function Login() {
               <span className="px-2 bg-white text-gray-500">or</span>
             </div>
           </div>
+           {error && <p className="text-red-500 mb-4">{error}</p>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
