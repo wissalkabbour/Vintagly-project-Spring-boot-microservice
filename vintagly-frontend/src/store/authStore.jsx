@@ -1,7 +1,9 @@
 import { create } from "zustand";
+import { jwtDecode } from "jwt-decode";
 
 export const useAuthStore = create((set) => ({
   accessToken: null,
+  userInfo: null,
   isAuthenticated: false,
 
   login: async (email, password) => {
@@ -25,14 +27,24 @@ export const useAuthStore = create((set) => ({
     if (!res.ok) return false;
 
     const json = await res.json();
+    const token = json.access_token; 
+    const decoded = jwtDecode(token);
+    const userData = {
+      id: decoded.sub,
+      name: decoded.name || decoded.preferred_username,
+      email: decoded.email,
+      roles: decoded.realm_access?.roles || [],
+    };
 
     set({
       accessToken: json.access_token,
+      userInfo: userData,
       isAuthenticated: true,
     });
 
 
-    localStorage.setItem("token", json.access_token);
+    localStorage.setItem("token", token);
+    localStorage.setItem("userInfo", JSON.stringify(userData));
 
     return true;
   },
