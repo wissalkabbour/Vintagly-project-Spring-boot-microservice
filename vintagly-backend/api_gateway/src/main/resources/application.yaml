@@ -54,8 +54,11 @@ spring:
             - Path=/uploads/**
           filters:
             - PreserveHostHeader                
-server:
-  port: 8888
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/myrealm
 eureka:
   client:
     service-url:
