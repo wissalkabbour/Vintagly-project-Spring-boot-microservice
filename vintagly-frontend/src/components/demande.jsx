@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { getCategories } from "../services/categoryService";
+import { addDemande } from "../services/demandService";
+
 
 export default function Component() {
     const [formData, setFormData] = useState({
         businessName: '',
-        contactName: '',
+        price: '',
         email: '',
         phone: '',
         description: '',
+        historique: '',
         categories: [],
         eras: [],
         photos: [],
@@ -57,15 +60,7 @@ export default function Component() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleCheckboxChange = (e, field) => {
-        const { value, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [field]: checked 
-                ? [...prev[field], value]
-                : prev[field].filter(item => item !== value)
-        }));
-    };
+ 
 
     const handlePhotoUpload = (e) => {
         const files = Array.from(e.target.files);
@@ -81,47 +76,59 @@ export default function Component() {
         setPhotosPreviews(prev => [...prev, ...previews].slice(0, 5));
     };
 
-    const handleCertificationUpload = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setCertificationPreview(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+  const handleCertificationUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        setFormData(prev => ({ ...prev, businessLicense: file }));
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        
-        if (!formData.businessName || !formData.contactName || !formData.email || !formData.phone) {
-            alert('Veuillez remplir tous les champs obligatoires');
-            return;
-        }
-        
-        if (formData.categories.length === 0 || formData.eras.length === 0) {
-            alert('Veuillez sélectionner au moins une catégorie et une ère');
-            return;
-        }
-        
-        if (!formData.termsAccepted) {
-            alert('Veuillez accepter les conditions générales');
-            return;
-        }
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setCertificationPreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+    }
+};
 
+
+   const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // validation
+    if (!formData.businessName || !formData.price || !formData.email || !formData.phone) {
+        alert('Veuillez remplir tous les champs obligatoires');
+        return;
+    }
+    
+    if (formData.categories.length === 0 || !selectedEra) {
+        alert('Veuillez sélectionner au moins une catégorie et une ère');
+        return;
+    }
+    
+    if (!formData.termsAccepted) {
+        alert('Veuillez accepter les conditions générales');
+        return;
+    }
+
+    try {
+        const result = await addDemande({ ...formData, selectedEra });
+        console.log("Demande ajoutée :", result);
         setShowModal(true);
-        console.log('Application submitted:', formData);
-    };
+    } catch (error) {
+        console.error("Erreur:", error);
+        alert("Une erreur est survenue lors de l'envoi de votre demande.");
+    }
+};
+
 
     const closeModal = () => {
         setShowModal(false);
         setFormData({
             businessName: '',
-            contactName: '',
+            price: '',
             email: '',
             phone: '',
             description: '',
+            historique: '',
             categories: [],
             eras: [],
             photos: [],
@@ -162,7 +169,7 @@ export default function Component() {
 
                                 <div className="grid md:grid-cols-2 gap-4 ml-14">
                                     <div>
-                                        <label className="block text-[#3d3734] mb-2">Business/Vendor Name *</label>
+                                        <label className="block text-[#3d3734] mb-2">Business Name *</label>
                                         <input
                                             type="text"
                                             name="businessName"
@@ -173,15 +180,17 @@ export default function Component() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-[#3d3734] mb-2">Contact Name *</label>
+                                        <label className="block text-[#3d3734] mb-2">Price*</label>
                                         <input
-                                            type="text"
-                                            name="contactName"
-                                            value={formData.contactName}
-                                            onChange={handleInputChange}
-                                            className="w-full border border-[#a8b5b2] rounded p-2 focus:border-[#c89563] focus:ring-1 focus:ring-[#c89563] transition duration-200"
-                                            required
-                                        />
+                                        type="number"
+                                        step="0.01"
+                                        name="price"
+                                        value={formData.price}
+                                        onChange={handleInputChange}
+                                        className="w-full border border-[#a8b5b2] rounded p-2 focus:border-[#c89563] focus:ring-1 focus:ring-[#c89563] transition duration-200"
+                                        required
+                                    />
+
                                     </div>
                                     <div>
                                         <label className="block text-[#3d3734] mb-2">Email Address *</label>
@@ -238,6 +247,9 @@ export default function Component() {
                                         </label>
                                         <textarea
                                             rows="5"
+                                             value={formData.historique}
+                                             name="historique"  
+                                             onChange={handleInputChange}  
                                             className="w-full border border-[#a8b5b2] rounded p-2 focus:border-[#c89563] focus:ring-1 focus:ring-[#c89563] transition duration-200"
                                             placeholder="Share the history of your vintage piece — where it comes from, who owned it before, its unique story, and why it's special."
                                             required
@@ -283,18 +295,18 @@ export default function Component() {
                                             <label className="block text-[#3d3734] mb-2">Eras (Select one) *</label>
                                             <div className="flex flex-col gap-2">
                                                 {erasList.map((era) => (
-                                                    <label key={era} className="flex items-center gap-2 cursor-pointer">
-                                                        <input
-                                                            type="checkbox"
-                                                            name="era"
-                                                            value={era}
-                                                            checked={selectedEra === era}
-                                                            onChange={(e) => setSelectedEra(e.target.value)}
-                                                            className="accent-[#c89563] w-4 h-4"
-                                                            required
-                                                        />
-                                                        <span>{formatEra(era)}</span>
-                                                    </label>
+                                                <label key={era} className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                    type="radio"  // <-- change checkbox → radio
+                                                    name="era"
+                                                    value={era}
+                                                    checked={selectedEra === era}
+                                                    onChange={(e) => setSelectedEra(e.target.value)}
+                                                    className="accent-[#c89563] w-4 h-4"
+                                                    required
+                                                    />
+                                                    <span>{formatEra(era)}</span>
+                                                </label>
                                                 ))}
                                             </div>
                                         </div>

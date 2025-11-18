@@ -26,43 +26,37 @@ spring:
 
         # ---- CATALOGUE service (protégé) ----
         - id: catalogue-service
-          uri: http://localhost:8190
+          uri: lb://catalogue-service
           predicates:
             - Path=/api/catalogue/**
-
-        # ---- PANIER service (protégé) ----
-        - id: panier-service
-          uri: lb://grp8-panier-service
+        - id: catalogue-service-images
+          uri: lb://catalogue-service
           predicates:
-            - Path=/api/paniers/**
-
-        # ---- PAYMENT service (protégé) ----
+            - Path=/uploads/**
+          filters:
+            - RewritePath=/uploads/(?<segment>.*),/uploads/${segment}
+        - id: panier-service
+          uri: lb://panier-service
+          predicates:
+            - Path=/api/panier/**
         - id: payment-service
           uri: lb://payment-service
           predicates:
-            - Path=/payment/**
-
-        # ---- DEMANDE service (protégé) ----
+            - Path=/api/payment/**
         - id: demande-service
           uri: lb://demande-service
           predicates:
             - Path=/api/demandes/**
-
         # ---- UPLOADS (PUBLIC) ----
         - id: catalogue-static-uploads
           uri: http://localhost:8084
           predicates:
             - Path=/uploads/**
           filters:
-            - PreserveHostHeader
-
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:8080/realms/myrealm
-
+            - PreserveHostHeader                
+server:
+  port: 8888
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8196/eureka
+      defaultZone: http://localhost:8761/eureka

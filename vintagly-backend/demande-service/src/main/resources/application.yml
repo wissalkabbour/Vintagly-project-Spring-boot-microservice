@@ -35,8 +35,8 @@ uploadDir: ${user.dir}/uploads
 
 server:
   port: 8191
-
+  
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka-server:8196/eureka
+      defaultZone: http://localhost:8196/eureka

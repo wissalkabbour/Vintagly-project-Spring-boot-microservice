@@ -4,19 +4,25 @@ import com.example.entities.Article;
 import com.example.entities.Image;
 import com.example.repositories.ArticleRepository;
 import com.example.repositories.ImageRepository;
+
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/images")
+@RequestMapping("/api/catalogue/images")
+@CrossOrigin(origins = "http://localhost:5173") 
+
 public class ImageController {
 
     private final ImageRepository imageRepository;
@@ -27,28 +33,51 @@ public class ImageController {
         this.articleRepository = articleRepository;
     }
 
-    
-    @PostMapping("/upload")
-    public ResponseEntity<Image> uploadImage(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("demandeId") Long demandeId
-    ) throws IOException {
-        Path uploadDir = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "uploads");
-        Files.createDirectories(uploadDir);
+   @PostMapping("/upload")
+public ResponseEntity<Image> uploadImage(
+        @RequestParam("file") MultipartFile file,
+        @RequestParam("demandeId") Long demandeId
+) throws IOException {
 
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        Path filePath = uploadDir.resolve(fileName);
-        file.transferTo(filePath.toFile());
+    if (file != null && !file.isEmpty()) {
+        // Récupération du chemin du microservice
+        String decodedPath = URLDecoder.decode(
+                this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath(),
+                StandardCharsets.UTF_8
+        );
 
+        String basePath = new File(decodedPath)
+                .getParentFile()  // target
+                .getParentFile()  // racine du microservice
+                .getAbsolutePath();
+
+        // Dossier uploads dans resources
+        File uploadPath = new File(basePath, "src/main/resources/static/uploads");
+        if (!uploadPath.exists() && !uploadPath.mkdirs()) {
+            throw new IOException("Impossible de créer le dossier d'upload : " + uploadPath.getAbsolutePath());
+        }
+
+        // Nettoyage et génération du nom de fichier
+        String cleanFileName = file.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+        String finalFileName = System.currentTimeMillis() + "_" + cleanFileName;
+
+        // Sauvegarde physique du fichier
+        File dest = new File(uploadPath, finalFileName);
+        file.transferTo(dest);
+
+        // Sauvegarde en base
         Image image = new Image();
-        image.setPath("/uploads/" + fileName);
+        image.setPath("/uploads/" + finalFileName); // chemin HTTP
         image.setDemandeId(demandeId);
-        image.setArticle(null);
+        imageRepository.save(image);
 
-        Image saved = imageRepository.save(image);
-        System.out.println(" Image enregistrée pour demande " + demandeId);
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.ok(image);
+    } else {
+        return ResponseEntity.badRequest().build();
     }
+}
+
+
 
     @PutMapping("/updateByDemande/{demandeId}/{articleId}")
     public ResponseEntity<String> updateImagesByDemande(
@@ -73,9 +102,10 @@ public class ImageController {
         return ResponseEntity.ok("Images mises à jour avec l'articleId: " + articleId);
     }
 
-    @GetMapping("/demande/{demandeId}")
-    public ResponseEntity<List<Image>> getImagesByDemande(@PathVariable Long demandeId) {
-        List<Image> images = imageRepository.findByDemandeId(demandeId);
-        return ResponseEntity.ok(images);
-    }
+   @GetMapping("/demande/{demandeId}")
+public ResponseEntity<List<Image>> getImagesByDemande(@PathVariable Long demandeId) {
+    List<Image> images = imageRepository.findByDemandeId(demandeId);
+    return ResponseEntity.ok(images);
+}
+
 }

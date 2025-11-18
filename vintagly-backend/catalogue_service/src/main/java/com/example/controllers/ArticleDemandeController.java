@@ -7,7 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/articles")
+@RequestMapping("/api/catalogue/articles")
+@CrossOrigin(origins = "http://localhost:5173") 
+
 public class ArticleDemandeController {
 
     private final ArticleRepository articleRepository;
