@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { jwtDecode } from "jwt-decode";
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create((set, get) => ({
   accessToken: null,
   userInfo: null,
   isAuthenticated: false,
@@ -47,6 +47,20 @@ export const useAuthStore = create((set) => ({
     localStorage.setItem("userInfo", JSON.stringify(userData));
 
     return true;
+  },
+
+  getUserRoles: () => {
+    const { userInfo } = get();
+    return userInfo?.roles || [];
+  },
+
+    isAdmin: () => {
+    const { userInfo } = get();
+    return userInfo?.roles?.includes("admin");
+  },
+    hasRole: (role) => {
+    const { userInfo } = get();
+    return userInfo?.roles?.includes(role);
   },
 
 }));
