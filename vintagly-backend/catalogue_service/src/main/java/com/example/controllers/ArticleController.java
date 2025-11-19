@@ -47,7 +47,6 @@ public class ArticleController {
             article.setPrix(prix);
             article.setProductLifecycle(productLifecycle);
             article.setIdVendeur(idVendeur);
-
             articleService.addArticle(article, categorieId, certificatFile, images);
 
             response.put("message", "✅ Article ajouté avec succès !");
