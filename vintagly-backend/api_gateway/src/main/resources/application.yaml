@@ -59,7 +59,7 @@ spring:
 
         # UPLOADS static files
         - id: catalogue-static-uploads
-          uri: http://localhost:8190
+          uri: lb://catalogue-service
           predicates:
             - Path=/uploads/**
           filters:

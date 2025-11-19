@@ -50,7 +50,7 @@ const Catalogue = () => {
 
     const fileName = path.split("/uploads/")[1];
     const encoded = encodeURIComponent(fileName);
-    return `http://localhost:8888/uploads/${encoded}`;
+    return `http://localhost:8195/uploads/${encoded}`;
   };
 
   return (
@@ -113,14 +113,12 @@ const Catalogue = () => {
               return (
                 <div key={product.id} className="product-card">
                   <img
-                    src="http://localhost:8888/uploads/1763315017385_Schema_UNET_Architecture.png"
-
-                    alt={product.nom}
+                    src={url}
                     className="product-image"
                   />
 
                   <div className="product-info">
-                    <p className="text-xs text-gray-500 break-all">{url}</p>
+                    <p className="text-xs text-gray-500 break-all"></p>
                     <p className="product-name">{product.nom}</p>
                     <p className="product-price">{product.prix} €</p>
                     <p className="text-xs text-gray-500">
@@ -183,8 +181,8 @@ const Catalogue = () => {
                           
 
                             <div className="product-info">
-                              <p className="product-name">{product.images[0]?.path}</p>
-                              <p className="product-price">{url} €</p>
+                              <p className="product-name">{product.nom}</p>
+                              <p className="product-price">{product.prix} €</p>
                             </div>
                           </div>
                         );
