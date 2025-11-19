@@ -12,12 +12,12 @@
 # server.port=8085
 spring:
   application:
-    name: gr8_demande_service
+    name: demande-service
 
   datasource:
-    url: jdbc:postgresql://db:5432/gr8_demande_db
-    username: gr8_demande_user
-    password: dbpass
+    url: jdbc:postgresql://ep-delicate-rice-a89bnyyp-pooler.eastus2.azure.neon.tech:5432/grp8_demande_db
+    username: neondb_owner
+    password: npg_YSBE1HXKTzV3
     driver-class-name: org.postgresql.Driver
 
   jpa:

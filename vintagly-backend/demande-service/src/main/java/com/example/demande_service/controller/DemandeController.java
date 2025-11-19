@@ -167,7 +167,7 @@ public ResponseEntity<String> validerDemande(
         RestTemplate restTemplate = new RestTemplate();
 
         //  Créer l'article dans le catalogue-service avec les nouvelles valeurs + certificat
-        String urlArticle = "http://localhost:8195/api/catalogue/articles";
+        String urlArticle = "http://localhost:8195/api/catalogue/articlesD";
 
         Map<String, Object> articleData = new HashMap<>();
         articleData.put("nom", articleNom);
