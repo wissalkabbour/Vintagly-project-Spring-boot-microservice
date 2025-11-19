@@ -62,7 +62,6 @@ public class ArticleController {
     /**
      * 📜 Lister tous les articles (ADMIN + CUSTOMER)
      */
-    @PreAuthorize("hasAnyAuthority('admin', 'customer')")
     @GetMapping
     public ResponseEntity<List<Article>> getAllArticles() {
         return ResponseEntity.ok(articleService.getAllArticles());
@@ -71,7 +70,6 @@ public class ArticleController {
     /**
      * 🔍 Afficher un article par ID (ADMIN + CUSTOMER)
      */
-    @PreAuthorize("hasAnyAuthority('admin', 'customer')")
     @GetMapping("/{id}")
     public ResponseEntity<Article> getArticleById(@PathVariable Long id) {
         return ResponseEntity.ok(articleService.getArticleById(id));

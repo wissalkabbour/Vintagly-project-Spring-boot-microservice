@@ -7,11 +7,10 @@ const getAuthToken = () => {
   return localStorage.getItem("token");
 };
 
-// 📌 Instance Axios avec token automatique
-const axiosInstance = axios.create();
+// 📌 Instance Axios AVEC token (pour POST, DELETE…)
+const axiosAuth = axios.create();
 
-// ➕ Ajouter automatiquement le token pour chaque requête
-axiosInstance.interceptors.request.use(
+axiosAuth.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
     if (token) {
@@ -22,10 +21,16 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// 📌 Récupérer toutes les catégories
+// 📌 Instance Axios SANS token (pour GET public)
+const axiosPublic = axios.create();
+
+
+// =============================
+// ✅ GET CATEGORIES — PUBLIC
+// =============================
 export const getCategories = async () => {
   try {
-    const response = await axiosInstance.get(API_URL);
+    const response = await axiosPublic.get(API_URL);
     return response.data;
   } catch (error) {
     console.error("❌ Erreur lors du fetch des catégories :", error);
@@ -33,10 +38,12 @@ export const getCategories = async () => {
   }
 };
 
-// 📌 Ajouter une catégorie
+// =============================
+// 🔐 ADD CATEGORY — ADMIN
+// =============================
 export const addCategory = async (categorie) => {
   try {
-    const response = await axiosInstance.post(API_URL, categorie);
+    const response = await axiosAuth.post(API_URL, categorie);
     return response.data;
   } catch (error) {
     console.error("❌ Erreur lors de l'ajout de la catégorie :", error);
@@ -44,10 +51,12 @@ export const addCategory = async (categorie) => {
   }
 };
 
-// 📌 Supprimer une catégorie
+// =============================
+// 🔐 DELETE CATEGORY — ADMIN
+// =============================
 export const deleteCategory = async (id) => {
   try {
-    const response = await axiosInstance.delete(`${API_URL}/${id}`);
+    const response = await axiosAuth.delete(`${API_URL}/${id}`);
     return response.data;
   } catch (error) {
     console.error("❌ Erreur lors de la suppression :", error);

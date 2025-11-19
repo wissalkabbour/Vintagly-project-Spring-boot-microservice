@@ -39,29 +39,29 @@ export const articleService = {
 
   // 📌 Charger toutes les catégories
   getCategories: async () => {
-    try {
-      const token = getAuthToken();
-      console.log("tokenn",token)
+  try {
+    const response = await fetch(`${API_BASE_URL}/categories`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-      const response = await fetch(`${API_BASE_URL}/categories`, {
-        method: "GET",
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-      });
-console.log("resssssssss",response)
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Erreur lors du chargement des catégories");
-      }
+    console.log("resssssssss", response);
 
-      const data = await response.json();
-      console.log("categories", data);
-      return Array.isArray(data) ? data : [];
-    } catch (error) {
-      console.error("Erreur dans getCategories:", error);
-      return [];
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Erreur lors du chargement des catégories");
     }
-  },
+
+    const data = await response.json();
+    console.log("categories", data);
+
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error("Erreur dans getCategories:", error);
+    return [];
+  }
+},
 
 };
