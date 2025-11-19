@@ -1,6 +1,6 @@
 server:
   port: 8195
-  forward-headers-strategy: framework   # 🔥 indispensable pour transférer Authorization
+  forward-headers-strategy: framework   # indispensable pour transférer Authorization
 
 spring:
   application:
@@ -8,9 +8,23 @@ spring:
 
   cloud:
     gateway:
+      # 🔥 CORS GLOBAL
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
       default-filters:
-        - TokenRelay                    # 🔥 TRANSFÈRE le token aux microservices
-        - RemoveRequestHeader=Cookie    # 🔒 évite les conflits avec Keycloak
+        - TokenRelay
+        - RemoveRequestHeader=Cookie
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
 
       discovery:
         locator:
@@ -18,48 +32,51 @@ spring:
           lower-case-service-id: true
 
       routes:
-        # ---- AUTH service (public) ----
         - id: auth-service
           uri: lb://auth-service
           predicates:
             - Path=/auth/**
 
-        # ---- CATALOGUE service (protégé) ----
         - id: catalogue-service
           uri: lb://catalogue-service
           predicates:
             - Path=/api/catalogue/**
-        - id: catalogue-service-images
-          uri: lb://catalogue-service
-          predicates:
-            - Path=/uploads/**
-          filters:
-            - RewritePath=/uploads/(?<segment>.*),/uploads/${segment}
+
         - id: panier-service
           uri: lb://panier-service
           predicates:
-            - Path=/api/panier/**
+            - Path=/panier/**
+
         - id: payment-service
           uri: lb://payment-service
           predicates:
-            - Path=/api/payment/**
+            - Path=/payment/**
+
         - id: demande-service
           uri: lb://demande-service
           predicates:
             - Path=/api/demandes/**
-        # ---- UPLOADS (PUBLIC) ----
+
+        # UPLOADS static files
         - id: catalogue-static-uploads
-          uri: http://localhost:8084
+          uri: lb://catalogue-service
           predicates:
             - Path=/uploads/**
           filters:
-            - PreserveHostHeader                
+            - PreserveHostHeader
+
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/myrealm
+
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://localhost:8196/eureka
+
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+    ip-address: 127.0.0.1

@@ -3,9 +3,9 @@ spring:
     name: catalogue-service
 
   datasource:
-    url: jdbc:postgresql://ep-curly-tooth-a80fflxw-pooler.eastus2.azure.neon.tech:5432/neondb?sslmode=require
-    username: neondb_owner
-    password: npg_UsfeHkAmX5w7
+    url: jdbc:postgresql://localhost:5432/grp8_catalogue_db
+    username: postgres
+    password: 11aminalina
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -21,19 +21,27 @@ spring:
       enabled: true
       max-file-size: 10MB
       max-request-size: 20MB
+
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/myrealm
-          
-upload:
-  dir: uploads
 
+upload:
+  dir: src/main/resources/static/uploads
 
 server:
   port: 8190
+
 eureka:
   client:
+    register-with-eureka: true
+    fetch-registry: true
     service-url:
       defaultZone: http://localhost:8196/eureka
+
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
