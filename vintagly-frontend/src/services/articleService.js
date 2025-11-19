@@ -1,7 +1,13 @@
-const API_BASE_URL = "http://localhost:8888/api/catalogue";
+const API_BASE_URL = "http://localhost:8195/api/catalogue";
+
+// Fonction utilitaire pour récupérer le token
+const getAuthToken = () => {
+  return localStorage.getItem("token"); // Assure-toi que tu stockes bien "token"
+};
 
 export const articleService = {
-  // Ajouter un article
+
+  // ➕ Ajouter un article
   addArticle: async (formData) => {
     console.log("Contenu du FormData :");
     for (let pair of formData.entries()) {
@@ -9,8 +15,13 @@ export const articleService = {
     }
 
     try {
+      const token = getAuthToken();
+
       const response = await fetch(`${API_BASE_URL}/articles`, {
         method: "POST",
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
         body: formData,
       });
 
@@ -26,20 +37,31 @@ export const articleService = {
     }
   },
 
-  // Charger toutes les catégories
+  // 📌 Charger toutes les catégories
   getCategories: async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/categories`);
+      const token = getAuthToken();
+      console.log("tokenn",token)
+
+      const response = await fetch(`${API_BASE_URL}/categories`, {
+        method: "GET",
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
+console.log("resssssssss",response)
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || "Erreur lors du chargement des catégories");
       }
+
       const data = await response.json();
-      console.log("articles",data)
+      console.log("categories", data);
       return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error("Erreur dans getCategories:", error);
       return [];
     }
   },
+
 };
