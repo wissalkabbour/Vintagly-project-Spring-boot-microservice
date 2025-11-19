@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/grp8_catalogue_db
     username: postgres
-    password: 11aminalina
+    password: 1234
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -32,7 +32,7 @@ app:
   keycloak:
     admin:
       clientId: backend
-      clientSecret: wS9nhxLfxtWOjteSOwHgaVAxX18pVOjb
+      clientSecret: wg8bnXFmD8Hatsnlmv8ty7UGZXXlx6ei
     realm: myrealm
     serverUrl: http://localhost:8080
  
