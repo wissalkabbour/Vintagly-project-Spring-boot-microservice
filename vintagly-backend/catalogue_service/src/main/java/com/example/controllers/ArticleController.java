@@ -47,7 +47,6 @@ public class ArticleController {
             article.setPrix(prix);
             article.setProductLifecycle(productLifecycle);
             article.setIdVendeur(idVendeur);
-
             articleService.addArticle(article, categorieId, certificatFile, images);
 
             response.put("message", "✅ Article ajouté avec succès !");
@@ -62,7 +61,6 @@ public class ArticleController {
     /**
      * 📜 Lister tous les articles (ADMIN + CUSTOMER)
      */
-    @PreAuthorize("hasAnyAuthority('admin', 'customer')")
     @GetMapping
     public ResponseEntity<List<Article>> getAllArticles() {
         return ResponseEntity.ok(articleService.getAllArticles());
@@ -71,7 +69,6 @@ public class ArticleController {
     /**
      * 🔍 Afficher un article par ID (ADMIN + CUSTOMER)
      */
-    @PreAuthorize("hasAnyAuthority('admin', 'customer')")
     @GetMapping("/{id}")
     public ResponseEntity<Article> getArticleById(@PathVariable Long id) {
         return ResponseEntity.ok(articleService.getArticleById(id));

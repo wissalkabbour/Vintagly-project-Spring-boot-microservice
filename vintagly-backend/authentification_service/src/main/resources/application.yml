@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8186
 
 spring:
   application:
@@ -32,10 +32,10 @@ app:
   keycloak:
     admin:
       clientId: backend
-      clientSecret: wS9nhxLfxtWOjteSOwHgaVAxX18pVOjb
+      clientSecret: X5X2G9FkUWZ0esrG1AXzJaSKbiR6FKYY
     realm: myrealm
     serverUrl: http://localhost:8080
- 
+
 eureka:
   client:
     service-url:
