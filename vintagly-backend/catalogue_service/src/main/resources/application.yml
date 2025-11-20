@@ -3,9 +3,9 @@ spring:
     name: catalogue-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/grp8_catalogue_db
-    username: postgres
-    password: 11aminalina
+    url: jdbc:postgresql://localhost:5432/gr8_catalogue_db
+    username: gr8_catalogue_user
+    password: dbpass
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -27,6 +27,8 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/myrealm
+          # Si un jour tu as une erreur : uncomment ci-dessous
+          # jwk-set-uri: http://localhost:8080/realms/myrealm/protocol/openid-connect/certs
 
 upload:
   dir: src/main/resources/static/uploads
@@ -36,12 +38,5 @@ server:
 
 eureka:
   client:
-    register-with-eureka: true
-    fetch-registry: true
     service-url:
       defaultZone: http://localhost:8196/eureka
-
-  instance:
-    hostname: localhost
-    prefer-ip-address: true
-    ip-address: 127.0.0.1

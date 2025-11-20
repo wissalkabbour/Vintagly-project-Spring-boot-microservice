@@ -32,7 +32,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/catalogue/articles/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/catalogue/categories/**").permitAll()
 
-                       
+
                         // 👉 any other request must be authenticated
                         .anyExchange().authenticated()
                 )

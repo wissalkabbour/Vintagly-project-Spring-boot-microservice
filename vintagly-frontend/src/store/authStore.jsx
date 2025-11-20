@@ -10,7 +10,7 @@ export const useAuthStore = create((set, get) => ({
     const data = new URLSearchParams();
     data.append("grant_type", "password");
     data.append("client_id", "backend");
-    data.append("client_secret", "NEPnUB9mBcwReLXDdrOeABtbjw4HCAIG");
+    data.append("client_secret", "X5X2G9FkUWZ0esrG1AXzJaSKbiR6FKYY");
     data.append("username", email);
     data.append("password", password);
 
@@ -64,3 +64,23 @@ export const useAuthStore = create((set, get) => ({
   },
 
 }));
+// Restore authentication on page load
+const savedToken = localStorage.getItem("token");
+const savedUser = localStorage.getItem("userInfo");
+
+if (savedToken && savedUser) {
+  try {
+    const parsedUser = JSON.parse(savedUser);
+
+    useAuthStore.setState({
+      accessToken: savedToken,
+      userInfo: parsedUser,
+      isAuthenticated: true,
+    });
+  } catch (e) {
+    console.error("Error restoring auth:", e);
+    localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
+  }
+}
+

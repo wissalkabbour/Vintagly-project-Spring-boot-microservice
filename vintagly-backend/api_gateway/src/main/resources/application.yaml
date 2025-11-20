@@ -42,10 +42,11 @@ spring:
           predicates:
             - Path=/api/catalogue/**
 
+        # ---- PANIER service (protégé) ----
         - id: panier-service
-          uri: lb://panier-service
+          uri: lb://grp8-panier-service
           predicates:
-            - Path=/panier/**
+            - Path=/api/paniers/**
 
         - id: payment-service
           uri: lb://payment-service
