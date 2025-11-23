@@ -23,13 +23,14 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // 👉 AUTH service public
-                        .pathMatchers("/auth/**").permitAll()
+                        .pathMatchers("/public/auth/**").permitAll()
 
                         // 👉 uploads public
                         .pathMatchers("/uploads/**").permitAll()
 
                         // 👉 🔓 Public GET endpoints
                         .pathMatchers(HttpMethod.GET, "/api/catalogue/articles/**").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/public/auth/register").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/catalogue/categories/**").permitAll()
 
 

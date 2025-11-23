@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: gr8_authentification_service
+    name: authentification-service
 
   datasource:
     url: jdbc:postgresql://localhost:5432/grp8_catalogue_db
@@ -32,7 +32,7 @@ app:
   keycloak:
     admin:
       clientId: backend
-      clientSecret: X5X2G9FkUWZ0esrG1AXzJaSKbiR6FKYY
+      clientSecret: wS9nhxLfxtWOjteSOwHgaVAxX18pVOjb
     realm: myrealm
     serverUrl: http://localhost:8080
 
