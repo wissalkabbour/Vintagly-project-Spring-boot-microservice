@@ -22,7 +22,7 @@ spring:
             allowCredentials: true
 
       default-filters:
-        - TokenRelay
+#        - TokenRelay
         - RemoveRequestHeader=Cookie
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
 
@@ -32,10 +32,10 @@ spring:
           lower-case-service-id: true
 
       routes:
-        - id: auth-service
-          uri: lb://auth-service
+        - id: authentification-service
+          uri: lb://authentification-service
           predicates:
-            - Path=/auth/**
+            - Path=/public/auth/**
 
         - id: catalogue-service
           uri: lb://catalogue-service
