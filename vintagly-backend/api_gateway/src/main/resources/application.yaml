@@ -22,7 +22,7 @@ spring:
             allowCredentials: true
 
       default-filters:
-        - TokenRelay
+#        - TokenRelay
         - RemoveRequestHeader=Cookie
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
 
