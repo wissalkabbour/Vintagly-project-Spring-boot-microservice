@@ -26,7 +26,6 @@ import org.springframework.util.MultiValueMap;
 
 @RestController
 @RequestMapping("/api/demandes")
-// @CrossOrigin(origins = "*")
 
 public class DemandeController {
 
@@ -155,7 +154,7 @@ public ResponseEntity<String> validerDemande(
         try {
             articleEra = Era.valueOf((String) updatedFields.get("era"));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("Valeur de era invalide : " + updatedFields.get("eras"));
+            return ResponseEntity.badRequest().body("Valeur de era invalide : " + updatedFields.get("era"));
         }
     }
 

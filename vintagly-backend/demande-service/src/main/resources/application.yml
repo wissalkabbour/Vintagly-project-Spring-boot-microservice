@@ -27,7 +27,13 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/myrealm
+          # Si un jour tu as une erreur : uncomment ci-dessous
+          # jwk-set-uri: http://localhost:8080/realms/myrealm/protocol/openid-connect/certs
 file:
   upload-dir: uploads/
 
