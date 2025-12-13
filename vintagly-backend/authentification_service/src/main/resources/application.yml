@@ -1,9 +1,9 @@
 server:
-  port: 8081
+  port: 8186
 
 spring:
   application:
-    name: gr8_authentification_service
+    name: authentification-service
 
   datasource:
     url: jdbc:postgresql://localhost:5432/grp8_catalogue_db
@@ -35,7 +35,7 @@ app:
       clientSecret: wg8bnXFmD8Hatsnlmv8ty7UGZXXlx6ei
     realm: myrealm
     serverUrl: http://localhost:8080
- 
+
 eureka:
   client:
     service-url:

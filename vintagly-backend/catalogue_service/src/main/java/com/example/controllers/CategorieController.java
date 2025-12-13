@@ -31,7 +31,6 @@ public class CategorieController {
     /**
      * 📜 Lister les catégories (ADMIN + CUSTOMER)
      */
-    @PreAuthorize("hasAnyAuthority('admin', 'customer')")
     @GetMapping
     public ResponseEntity<List<Categorie>> getAllCategories() {
         return ResponseEntity.ok(categorieService.getAllCategories());

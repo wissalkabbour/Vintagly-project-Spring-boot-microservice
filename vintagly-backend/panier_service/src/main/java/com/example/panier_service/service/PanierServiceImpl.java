@@ -5,8 +5,10 @@ import com.example.panier_service.dto.CatalogueArticleResponse;
 import com.example.panier_service.dto.PanierResponseDTO;
 import com.example.panier_service.entity.Panier;
 import com.example.panier_service.entity.PanierItem;
+import com.example.panier_service.exception.ArticleNotFoundException;
 import com.example.panier_service.repository.PanierRepository;
 import com.example.panier_service.repository.PanierItemRepository;
+import feign.FeignException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.panier_service.clients.ArticleClient;
@@ -45,17 +47,38 @@ public class PanierServiceImpl implements PanierService {
     @Override
     public Panier addArticle(String userId, Long articleId) {
 
-        // get or create user's active panier
-        Panier panier = createPanier(userId);
+        // Vérifier que l’article existe dans le catalogue
+        try {
+            articleClient.getArticleById(articleId);
+        } catch (FeignException.NotFound e) {
+            throw new ArticleNotFoundException(
+                    "L’article avec l’ID " + articleId + " n’existe pas dans le catalogue."
+            );
+        }
 
-        PanierItem item = PanierItem.builder()
-                .articleId(articleId)
-                .panier(panier)
-                .build();
+        // Récupérer ou créer le panier actif de l'utilisateur
+        Panier panier = panierRepository
+                .findByIdUtilisateurAndEtat(userId, true)
+                .orElseGet(() -> createPanier(userId));
 
-        panierItemRepository.save(item);
-        return panier;
+        // 🔥 Vérifier si l’article est déjà dans le panier
+        boolean alreadyExists = panier.getItems().stream()
+                .anyMatch(i -> i.getArticleId().equals(articleId));
+
+        if (alreadyExists) {
+            throw new RuntimeException("Cet article est déjà dans votre panier.");
+        }
+
+        // Ajouter un nouvel item
+        PanierItem item = new PanierItem();
+        item.setArticleId(articleId);
+        item.setPanier(panier);
+
+        panier.getItems().add(item);
+
+        return panierRepository.save(panier);
     }
+
 
     @Override
     public Panier removeArticle(String userId, Long articleId) {

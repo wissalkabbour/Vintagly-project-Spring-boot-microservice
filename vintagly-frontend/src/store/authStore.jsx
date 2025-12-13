@@ -64,3 +64,23 @@ export const useAuthStore = create((set, get) => ({
   },
 
 }));
+// Restore authentication on page load
+const savedToken = localStorage.getItem("token");
+const savedUser = localStorage.getItem("userInfo");
+
+if (savedToken && savedUser) {
+  try {
+    const parsedUser = JSON.parse(savedUser);
+
+    useAuthStore.setState({
+      accessToken: savedToken,
+      userInfo: parsedUser,
+      isAuthenticated: true,
+    });
+  } catch (e) {
+    console.error("Error restoring auth:", e);
+    localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
+  }
+}
+

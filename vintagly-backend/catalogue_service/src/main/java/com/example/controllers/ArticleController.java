@@ -49,7 +49,6 @@ public class ArticleController {
             article.setPrix(prix);
             article.setProductLifecycle(productLifecycle);
             article.setIdVendeur(idVendeur);
-
             articleService.addArticle(article, categorieId, certificatFile, images);
 
             response.put("message", "✅ Article ajouté avec succès !");
@@ -64,7 +63,6 @@ public class ArticleController {
     /**
      * 📜 Lister tous les articles (ADMIN + CUSTOMER)
      */
-    @PreAuthorize("hasAnyAuthority('admin', 'customer')")
     @GetMapping
     public ResponseEntity<List<Article>> getAllArticles() {
         return ResponseEntity.ok(articleService.getAllArticles());
