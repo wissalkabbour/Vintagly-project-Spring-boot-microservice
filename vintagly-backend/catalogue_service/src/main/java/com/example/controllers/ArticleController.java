@@ -1,6 +1,7 @@
 package com.example.controllers;
 
 import com.example.entities.Article;
+import com.example.repositories.ArticleRepository;
 import com.example.services.ArticleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import java.util.Map;
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final ArticleRepository articleRepository;
 
     /**
      * ➕ Ajouter un article (ADMIN seulement)
@@ -68,15 +70,7 @@ public class ArticleController {
         return ResponseEntity.ok(articleService.getAllArticles());
     }
 
-    /**
-     * 🔍 Afficher un article par ID (ADMIN + CUSTOMER)
-     */
-    @PreAuthorize("hasAnyAuthority('admin', 'customer')")
-    @GetMapping("/{id}")
-    public ResponseEntity<Article> getArticleById(@PathVariable Long id) {
-        return ResponseEntity.ok(articleService.getArticleById(id));
-    }
-
+    
     /**
      * ✏️ Modifier un article (ADMIN seulement)
      */
@@ -108,4 +102,12 @@ public class ArticleController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
+
+    @GetMapping("/{id}")
+public ResponseEntity<Article> getArticleById(@PathVariable Long id) {
+    Article article = articleRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Article introuvable"));
+    return ResponseEntity.ok(article);
+}
+
 }
