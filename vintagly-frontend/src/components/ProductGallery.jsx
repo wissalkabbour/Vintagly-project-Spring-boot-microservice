@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 
+const BASE_URL = "http://localhost:8195";
+
 export default function ProductGallery({ images }) {
   const [selectedImage, setSelectedImage] = useState(0);
 
-  const imageUrls = images?.map(img => img.path) || [];
+  const imageUrls =
+    images?.map(img => `${BASE_URL}${img.path}`) || [];
 
   if (imageUrls.length === 0) {
     return (

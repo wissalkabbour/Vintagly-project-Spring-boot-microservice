@@ -26,7 +26,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/public/auth/register").permitAll()
                 .requestMatchers("/admin/**").hasRole("admin")
                 .requestMatchers("/customer/**").hasRole("customer")
                 .requestMatchers("/user/**").authenticated()
@@ -83,4 +83,5 @@ public class SecurityConfig {
             return authorities;
         }
     }
+
 }

@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { BarChart3, Clock, CheckCircle, XCircle, RefreshCw, Search, Eye, FileText, Image } from "lucide-react";
+import { useAuthStore } from "../store/authStore";
 
 const getDemandes = async () => {
   try {
-    const response = await fetch("http://localhost:8191/api/demandes"); 
+    const token = localStorage.getItem("token") || useAuthStore.getState().accessToken;
+ const response = await fetch("http://localhost:8195/api/demandes", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,  
+      },
+    });
     if (!response.ok) throw new Error("Erreur réseau");
     const data = await response.json();
     return data;
@@ -42,7 +50,16 @@ export default function AdminDemandes() {
       const data = await getDemandes();
       const mapped = await Promise.all(data.map(async d => {
         // Récupérer les images depuis le microservice images
-        const imagesRes = await fetch(`http://localhost:8195/api/catalogue/images/demande/${d.id}`);
+const imagesRes = await fetch(
+  `http://localhost:8195/api/catalogue/images/demande/${d.id}`,
+  {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+  }
+);
         const images = await imagesRes.json();
 
         return {
@@ -139,38 +156,77 @@ export default function AdminDemandes() {
   };
 
   const handleValidateApproval = async () => {
-    try {
-      console.log('editedData avant envoi au backend:', editedData);
-      const response = await fetch(`http://localhost:8191/api/demandes/valider/${selectedDemande.id}`, {
+  try {
+    console.log('editedData avant envoi au backend:', editedData);
+
+    const token = localStorage.getItem('token'); // ou sessionStorage, selon ton choix
+
+    const response = await fetch(
+      `http://localhost:8195/api/demandes/valider/${selectedDemande.id}`,
+      {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // 🔥 envoi du token
         },
-        body: JSON.stringify(editedData)
-      });
-
-      if (response.ok) {
-        alert('✅ Demande validée et article créé avec succès !');
-        closeModal();
-        fetchDemandes();
-      } else {
-        const errorText = await response.text();
-        alert('❌ Erreur lors de la validation : ' + errorText);
+        body: JSON.stringify(editedData),
       }
-    } catch (error) {
-      console.error('Erreur:', error);
-      alert('❌ Erreur lors de la validation : ' + error.message);
+    );
+
+    if (response.ok) {
+      alert('✅ Demande validée et article créé avec succès !');
+      closeModal();
+      fetchDemandes();
+    } else {
+      const errorText = await response.text();
+      alert('❌ Erreur lors de la validation : ' + errorText);
     }
-  };
+  } catch (error) {
+    console.error('Erreur:', error);
+    alert('❌ Erreur lors de la validation : ' + error.message);
+  }
+};
+
+const handleDownloadCertificat = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`http://localhost:8195${selectedDemande.certificat}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) throw new Error("Erreur lors du téléchargement");
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = selectedDemande.certificat.split("/").pop();
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error(error);
+    alert("Impossible de télécharger le certificat : " + error.message);
+  }
+};
 
   const handleRefuse = async () => {
-    try {
-      const response = await fetch(`http://localhost:8191/api/demandes/refuser/${selectedDemande.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
+   try {
+  const token = localStorage.getItem("token"); // récupération du token
+
+  const response = await fetch(
+    `http://localhost:8195/api/demandes/refuser/${selectedDemande.id}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, // 🔥 envoi du token ici
+      }
+    }
+  );
 
       if (response.ok) {
         
@@ -540,16 +596,15 @@ export default function AdminDemandes() {
                 {selectedDemande.certificat && (
                   <div className="mb-6">
                     <h3 className="font-semibold text-[#4a6660] mb-2">Certificat</h3>
-                    <a 
-                      href={`http://localhost:8195${selectedDemande.certificat}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
+                    <button
+                      onClick={handleDownloadCertificat}
                       className="text-blue-600 underline"
                     >
                       Voir le certificat
-                    </a>
+                    </button>
                   </div>
                 )}
+
 
                 {/* Statut */}
                 <div className="mb-6">

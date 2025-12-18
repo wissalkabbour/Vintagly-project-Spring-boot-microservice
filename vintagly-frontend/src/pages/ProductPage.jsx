@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
-// import { useParams } from "react-router-dom";
+import { useParams } from "react-router-dom"; // 👈 importer useParams
 import { getProductById } from "../services/apiProduct";
 import ProductGallery from "../components/ProductGallery";
 import ProductDetails from "../components/ProductDetails";
 import Loader from "../components/Loader";
 
 export default function ProductPage() {
-  const id = 1;
+  const { id } = useParams(); // 👈 récupérer l'id depuis l'URL
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
     async function fetchProduct() {
-      const data = await getProductById(id);
-      setProduct(data);
+      try {
+        const data = await getProductById(id);
+        setProduct(data);
+      } catch (error) {
+        console.error("Erreur récupération produit :", error);
+      }
     }
     fetchProduct();
   }, [id]);

@@ -4,7 +4,7 @@ services:
   eureka-server:
     build: ../eureka_server
     ports:
-      - "8761:8761"
+      - "8196:8196"
 
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.0
@@ -28,7 +28,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/auth_db
       SPRING_DATASOURCE_USERNAME: auth_user
       SPRING_DATASOURCE_PASSWORD: dbpass
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8196/eureka
       APP_KEYCLOAK_SERVERURL: http://keycloak:8080
     ports:
       - "8081:8081"
