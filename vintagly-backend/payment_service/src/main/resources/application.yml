@@ -1,7 +1,49 @@
 spring:
   application:
-    name: payment_service
+    name: grp8-payment-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/gr8_payment_db
+    username: gr8_payment_user
+    password: dbpass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/myrealm
+
+server:
+  port: 8189
+
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8186/eureka
+      defaultZone: http://localhost:8196/eureka
+
+# Stripe Configuration
+stripe:
+  api:
+    key: sk_test_51SNzg0FdxZaZ6Nxl2dabcrmYB3vekO0N3vLyCAIbuidCwkoPM6ECugvYTyCjIXtPEfzrZvl653BzlAbe8Pp9g2x500Cpz6ICIV
+  webhook:
+    secret: whsec_b9722eded561244a51e0d78aa72f9fe629c6b8de26ba7cfd13796719a398ccee
+  success:
+    url: http://localhost:3000/payment/success
+  cancel:
+    url: http://localhost:3000/payment/cancel
+
+# URL du service panier
+panier:
+  service:
+    url: http://localhost:8188
+
+

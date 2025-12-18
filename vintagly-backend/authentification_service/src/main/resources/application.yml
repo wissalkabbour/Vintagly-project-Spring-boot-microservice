@@ -3,12 +3,12 @@ server:
 
 spring:
   application:
-    name: authentification-service
+    name: gr8_authentification_service
 
   datasource:
     url: jdbc:postgresql://localhost:5432/grp8_catalogue_db
     username: postgres
-    password: 1234
+    password: 11aminalina
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -32,7 +32,7 @@ app:
   keycloak:
     admin:
       clientId: backend
-      clientSecret: wg8bnXFmD8Hatsnlmv8ty7UGZXXlx6ei
+      clientSecret: TmUl7oedikL82hIqLEpcbShay1eX18pZ
     realm: myrealm
     serverUrl: http://localhost:8080
 
