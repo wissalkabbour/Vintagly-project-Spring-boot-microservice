@@ -1,8 +1,11 @@
 package com.example.payment_service.entity;
 
-
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
 @Entity
@@ -23,8 +26,14 @@ public class Facture {
 
     private LocalDate dateCreation;
 
-    private Long idUtilisateur;
+    private String idUtilisateur;  // ✅ CHANGÉ de Long à String
 
     private Long idPanier;
-}
 
+    private Long idCommande;
+
+    @Lob
+    private byte[] pdfContent;
+
+    private String numeroFacture;
+}

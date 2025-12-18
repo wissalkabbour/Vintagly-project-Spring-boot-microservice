@@ -48,10 +48,16 @@ spring:
           predicates:
             - Path=/api/paniers/**
 
-        - id: payment-service
-          uri: lb://payment-service
+            # AJOUTEZ cette route pour les commandes
+        - id: commande-routes
+          uri: lb://grp8-payment-service
           predicates:
-            - Path=/payment/**
+            - Path=/api/commandes/**
+
+        - id: payment-service
+          uri: lb://grp8-payment-service
+          predicates:
+            - Path=/api/payments/**
 
         - id: demande-service
           uri: lb://demande-service
