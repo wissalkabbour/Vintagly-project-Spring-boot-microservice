@@ -1,6 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
 import "./Catalogue.css";
-import { ChevronLeft, ChevronRight, Search, ShoppingCart } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  ShoppingCart,
+} from "lucide-react";
 import { articleService } from "../services/articleService";
 import NavbarCatalogue from "./catalog/NavbarCatalogue";
 import { useAuthStore } from "../store/authStore";
@@ -16,8 +21,19 @@ const Catalogue = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
 
-  const handleAddClick = async (id) => {
-    if (!isAuthenticated) return navigate("/login");
+  /* 👉 Redirection vers la page produit */
+  const handleProductClick = (id) => {
+    navigate(`/produit/${id}`);
+  };
+
+  /* 🛒 Ajouter au panier */
+  const handleAddClick = async (e, id) => {
+    e.stopPropagation(); // ⛔ empêche la redirection vers /produit
+
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
 
     try {
       await panierService.addArticle(id);
@@ -28,6 +44,7 @@ const Catalogue = () => {
     }
   };
 
+  /* 📦 Charger catégories + articles */
   useEffect(() => {
     const fetchData = async () => {
       const data = await articleService.getCategories();
@@ -36,6 +53,7 @@ const Catalogue = () => {
     fetchData();
   }, []);
 
+  /* ⬅️➡️ Scroll carrousel */
   const scroll = (index, direction) => {
     const container = scrollRefs.current[index];
     if (container) {
@@ -46,6 +64,7 @@ const Catalogue = () => {
     }
   };
 
+  /* 🔍 Recherche */
   const allArticles = categories.flatMap((cat) =>
     cat.articles.map((a) => ({ ...a, categoryName: cat.nom }))
   );
@@ -61,6 +80,7 @@ const Catalogue = () => {
     ? categories.filter((cat) => cat.id === selectedCategory)
     : categories;
 
+  /* 🖼️ Image */
   const getImageUrl = (path) => {
     if (!path) return "";
     const fileName = path.split("/uploads/")[1];
@@ -71,10 +91,10 @@ const Catalogue = () => {
   return (
     <>
       <NavbarCatalogue />
-      <br /><br />
+      <br />
+      <br />
 
       <div className="catalogue-container">
-
         {/* 🔍 Barre de recherche */}
         <div className="search-bar">
           <Search className="search-icon" />
@@ -92,11 +112,11 @@ const Catalogue = () => {
             <button
               onClick={() => setSelectedCategory(null)}
               className={`px-5 py-2 rounded-full border shadow-sm transition-all
-            ${
-              !selectedCategory
-                ? "bg-[#8c5d36] text-white border-[#8c5d36] shadow-md scale-105"
-                : "bg-white text-gray-700 border-[#b47b4e] hover:bg-[#b47b4e] hover:text-white"
-            }`}
+              ${
+                !selectedCategory
+                  ? "bg-[#8c5d36] text-white border-[#8c5d36] shadow-md scale-105"
+                  : "bg-white text-gray-700 border-[#b47b4e] hover:bg-[#b47b4e] hover:text-white"
+              }`}
             >
               Toutes
             </button>
@@ -106,11 +126,11 @@ const Catalogue = () => {
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
                 className={`px-5 py-2 rounded-full border shadow-sm transition-all
-              ${
-                selectedCategory === cat.id
-                  ? "bg-[#8c5d36] text-white border-[#8c5d36] shadow-md scale-105"
-                  : "bg-white text-gray-700 border-[#b47b4e] hover:bg-[#b47b4e] hover:text-white"
-              }`}
+                ${
+                  selectedCategory === cat.id
+                    ? "bg-[#8c5d36] text-white border-[#8c5d36] shadow-md scale-105"
+                    : "bg-white text-gray-700 border-[#b47b4e] hover:bg-[#b47b4e] hover:text-white"
+                }`}
               >
                 {cat.nom}
               </button>
@@ -120,7 +140,7 @@ const Catalogue = () => {
 
         {/* 🔎 Résultats recherche */}
         {searchedArticles && (
-          <div>
+          <>
             <h2 className="text-center text-xl font-bold my-4 text-[#8c5d36]">
               {searchedArticles.length} article(s) trouvé(s)
             </h2>
@@ -130,24 +150,37 @@ const Catalogue = () => {
                 const url = getImageUrl(product.images[0]?.path);
 
                 return (
-                  <div key={product.id} className="product-card">
-
-                    <button className="add-cart-btn" onClick={() => handleAddClick(product.id)}>
+                  <div
+                    key={product.id}
+                    className="product-card"
+                    onClick={() => handleProductClick(product.id)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <button
+                      className="add-cart-btn"
+                      onClick={(e) => handleAddClick(e, product.id)}
+                    >
                       <ShoppingCart size={20} />
                     </button>
 
-                    <img src={url} alt={product.nom} className="product-image" />
+                    <img
+                      src={url}
+                      alt={product.nom}
+                      className="product-image"
+                    />
 
                     <div className="product-info">
                       <p className="product-name">{product.nom}</p>
                       <p className="product-price">{product.prix} €</p>
-                      <p className="text-xs text-gray-500">{product.categoryName}</p>
+                      <p className="text-xs text-gray-500">
+                        {product.categoryName}
+                      </p>
                     </div>
                   </div>
                 );
               })}
             </div>
-          </div>
+          </>
         )}
 
         {/* 🎡 Carrousels */}
@@ -156,14 +189,26 @@ const Catalogue = () => {
             <div className="product-grid">
               {filteredCategories[0].articles.map((product) => {
                 const url = getImageUrl(product.images[0]?.path);
-                return (
-                  <div key={product.id} className="product-card">
 
-                    <button className="add-cart-btn" onClick={() => handleAddClick(product.id)}>
+                return (
+                  <div
+                    key={product.id}
+                    className="product-card"
+                    onClick={() => handleProductClick(product.id)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <button
+                      className="add-cart-btn"
+                      onClick={(e) => handleAddClick(e, product.id)}
+                    >
                       <ShoppingCart size={20} />
                     </button>
 
-                    <img src={url} alt={product.nom} className="product-image" />
+                    <img
+                      src={url}
+                      alt={product.nom}
+                      className="product-image"
+                    />
 
                     <div className="product-info">
                       <p className="product-name">{product.nom}</p>
@@ -181,32 +226,63 @@ const Catalogue = () => {
                     <h2 className="category-title">{cat.nom}</h2>
 
                     <div className="carousel-wrapper">
-                      <button className="scroll-btn left" onClick={() => scroll(index, "left")}>
+                      <button
+                        className="scroll-btn left"
+                        onClick={() => scroll(index, "left")}
+                      >
                         <ChevronLeft />
                       </button>
 
-                      <div className="carousel" ref={(el) => (scrollRefs.current[index] = el)}>
+                      <div
+                        className="carousel"
+                        ref={(el) => (scrollRefs.current[index] = el)}
+                      >
                         {cat.articles.map((product) => {
-                          const url = getImageUrl(product.images[0]?.path);
-                          return (
-                            <div key={product.id} className="product-card">
+                          const url = getImageUrl(
+                            product.images[0]?.path
+                          );
 
-                              <button className="add-cart-btn" onClick={() => handleAddClick(product.id)}>
+                          return (
+                            <div
+                              key={product.id}
+                              className="product-card"
+                              onClick={() =>
+                                handleProductClick(product.id)
+                              }
+                              style={{ cursor: "pointer" }}
+                            >
+                              <button
+                                className="add-cart-btn"
+                                onClick={(e) =>
+                                  handleAddClick(e, product.id)
+                                }
+                              >
                                 <ShoppingCart size={20} />
                               </button>
 
-                              <img src={url} alt={product.nom} className="product-image" />
+                              <img
+                                src={url}
+                                alt={product.nom}
+                                className="product-image"
+                              />
 
                               <div className="product-info">
-                                <p className="product-name">{product.nom}</p>
-                                <p className="product-price">{product.prix} €</p>
+                                <p className="product-name">
+                                  {product.nom}
+                                </p>
+                                <p className="product-price">
+                                  {product.prix} €
+                                </p>
                               </div>
                             </div>
                           );
                         })}
                       </div>
 
-                      <button className="scroll-btn right" onClick={() => scroll(index, "right")}>
+                      <button
+                        className="scroll-btn right"
+                        onClick={() => scroll(index, "right")}
+                      >
                         <ChevronRight />
                       </button>
                     </div>

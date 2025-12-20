@@ -11,6 +11,7 @@ import com.example.authentification_service.service.UserService;
 @RestController
 @RequestMapping("/public/auth")
 @RequiredArgsConstructor
+@CrossOrigin("http://localhost:5173")
 public class AuthController {
 
     private final UserService userService;

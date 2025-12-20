@@ -10,7 +10,7 @@ export const useAuthStore = create((set, get) => ({
     const data = new URLSearchParams();
     data.append("grant_type", "password");
     data.append("client_id", "backend");
-    data.append("client_secret", "TmUl7oedikL82hIqLEpcbShay1eX18pZ");
+    data.append("client_secret", "X5X2G9FkUWZ0esrG1AXzJaSKbiR6FKYY");
     data.append("username", email);
     data.append("password", password);
 
