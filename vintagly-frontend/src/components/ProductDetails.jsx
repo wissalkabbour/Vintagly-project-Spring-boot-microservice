@@ -1,15 +1,28 @@
 import React, { useState } from "react";
-
+import { useAuthStore } from "../store/authStore";
+import { useNavigate } from "react-router-dom";
+import { panierService } from "../services/panierService";
 export default function ProductDetails({ product }) {
   const [quantity, setQuantity] = useState(1);
-
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
   const handleQuantityChange = (change) => {
     const newQty = quantity + change;
     if (newQty >= 1 && newQty <= 99) {
       setQuantity(newQty);
     }
   };
+ const handleAddClick = async (id) => {
+    if (!isAuthenticated) return navigate("/login");
 
+    try {
+      await panierService.addArticle(id);
+      navigate("/panier");
+    } catch (err) {
+      console.error(err);
+      alert("Impossible d’ajouter au panier");
+    }
+  };
   const totalPrice = (product.prix * quantity).toFixed(2);
 
   const formatDate = (dateString) => {
@@ -119,11 +132,12 @@ export default function ProductDetails({ product }) {
         </div>
 
         <button
-          onClick={() => alert(`Ajouté au panier: ${quantity} × ${product.nom}`)}
-          className="w-full bg-[#386860] hover:bg-amber-800 text-white font-serif text-lg py-4 rounded-lg shadow-lg transition-all hover:shadow-xl hover:scale-[1.02]"
-        >
-          Ajouter au panier
-        </button>
+  onClick={() => handleAddClick(product.id)}
+  className="w-full bg-[#386860] hover:bg-amber-800 text-white font-serif text-lg py-4 rounded-lg shadow-lg transition-all hover:shadow-xl hover:scale-[1.02]"
+>
+  Ajouter au panier
+</button>
+
 
         <button 
           onClick={() => alert('Ajouté aux favoris!')}

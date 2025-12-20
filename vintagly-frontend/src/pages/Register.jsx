@@ -17,11 +17,10 @@ export default function Register() {
 
     try {
       const response = await axios.post(
-  "http://localhost:8195/public/auth/register",
-  { username: email, password, firstName, lastName, role: "customer" },
-  { headers: { "Content-Type": "application/json" } }
-);
-;
+        "http://localhost:8186/public/auth/register",
+        { username: email, password, firstName, lastName, role: "customer" },
+        { headers: { "Content-Type": "application/json" } }
+      );
       setMessage(response.data || 'User registered successfully. Check your email.');
     } catch (error) {
       console.error(error);
@@ -30,7 +29,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#f5f1e8] flex items-center justify-center p-4">
       <div className="max-w-6xl w-full grid md:grid-cols-2 gap-12 items-center">
         {/* Left Side - Features */}
         <div className="space-y-8">
@@ -49,7 +48,7 @@ export default function Register() {
             },
           ].map((feature, idx) => (
             <div key={idx} className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-6 h-6 bg-[#016B61] rounded-full flex items-center justify-center mt-1">
+              <div className="flex-shrink-0 w-6 h-6 bg-[#8c5d36] rounded-full flex items-center justify-center mt-1">
                 <svg
                   className="w-4 h-4 text-white"
                   fill="none"
@@ -65,20 +64,20 @@ export default function Register() {
                 </svg>
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.desc}</p>
+                <h3 className="text-xl font-semibold text-[#5d4827] mb-2">{feature.title}</h3>
+                <p className="text-[#6b4423]">{feature.desc}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Right Side - Signup Form */}
-        <div className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">Create your Free Account</h2>
+        <div className="bg-white rounded-lg shadow-2xl p-8 max-w-md mx-auto border-2 border-[#d8b370]">
+          <h2 className="text-3xl font-bold text-[#5d4827] mb-3">Create your Free Account</h2>
 
           <div className="space-y-4 mb-6">
             {/* Social Signups */}
-            <button className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <button className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-[#d8b370] rounded-lg hover:bg-[#f4decb] transition-colors">
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -97,32 +96,36 @@ export default function Register() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              <span className="text-gray-700 font-medium">Sign up with Google</span>
+              <span className="text-[#5d4827] font-medium">Sign up with Google</span>
             </button>
 
-            <button className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <button className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-[#d8b370] rounded-lg hover:bg-[#f4decb] transition-colors">
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
               </svg>
-              <span className="text-gray-700 font-medium">Sign up with Apple</span>
+              <span className="text-[#5d4827] font-medium">Sign up with Apple</span>
             </button>
           </div>
 
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t-2 border-[#d8b370]"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">or</span>
+              <span className="px-2 bg-white text-[#846953]">or</span>
             </div>
           </div>
 
-          {message && <p className="text-green-600 mb-4">{message}</p>}
+          {message && (
+            <p className="text-green-700 mb-4 bg-green-50 border border-green-200 rounded-lg p-3">
+              {message}
+            </p>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-900 mb-2">
+                <label htmlFor="firstName" className="block text-sm font-medium text-[#5d4827] mb-2">
                   First Name
                 </label>
                 <input
@@ -131,13 +134,13 @@ export default function Register() {
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="John"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#016B61] focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-3 border-2 border-[#d8b370] rounded-lg focus:ring-2 focus:ring-[#8c5d36] focus:border-[#8c5d36] outline-none transition-all"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-900 mb-2">
+                <label htmlFor="lastName" className="block text-sm font-medium text-[#5d4827] mb-2">
                   Last Name
                 </label>
                 <input
@@ -146,14 +149,14 @@ export default function Register() {
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Doe"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#016B61] focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-3 border-2 border-[#d8b370] rounded-lg focus:ring-2 focus:ring-[#8c5d36] focus:border-[#8c5d36] outline-none transition-all"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-900 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-[#5d4827] mb-2">
                 Email
               </label>
               <input
@@ -162,13 +165,13 @@ export default function Register() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@gmail.com"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#016B61] focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border-2 border-[#d8b370] rounded-lg focus:ring-2 focus:ring-[#8c5d36] focus:border-[#8c5d36] outline-none transition-all"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-900 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-[#5d4827] mb-2">
                 Password
               </label>
               <div className="relative">
@@ -177,13 +180,13 @@ export default function Register() {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#016B61] focus:border-transparent outline-none transition-all pr-12"
+                  className="w-full px-4 py-3 border-2 border-[#d8b370] rounded-lg focus:ring-2 focus:ring-[#8c5d36] focus:border-[#8c5d36] outline-none transition-all pr-12"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#846953] hover:text-[#5d4827]"
                 >
                   {showPassword ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,27 +223,27 @@ export default function Register() {
                 id="terms"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
-                className="w-4 h-4 mt-1 text-[#016B61] border-gray-300 rounded focus:ring-[#016B61]"
+                className="w-4 h-4 mt-1 text-[#8c5d36] border-[#d8b370] rounded focus:ring-[#8c5d36]"
                 required
               />
-              <label htmlFor="terms" className="text-sm text-gray-600">
+              <label htmlFor="terms" className="text-sm text-[#846953]">
                 By signing up, you are creating a Vintagly account, and you agree to Vintagly's{' '}
-                <a href="#" className="text-[#016B61] hover:underline">Terms of Use</a> and{' '}
-                <a href="#" className="text-[#016B61] hover:underline">Privacy Policy</a>.
+                <a href="#" className="text-[#8c5d36] hover:underline font-medium">Terms of Use</a> and{' '}
+                <a href="#" className="text-[#8c5d36] hover:underline font-medium">Privacy Policy</a>.
               </label>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-[#016B61] text-white py-3 rounded-lg font-medium hover:bg-[#016B61] transition-colors"
+              className="w-full bg-[#8c5d36] text-white py-3 rounded-lg font-semibold hover:bg-[#734f2e] transition-all shadow-lg hover:shadow-xl"
             >
               Create an account
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-600 mt-6">
+          <p className="text-center text-sm text-[#846953] mt-6">
             Already have an account?{' '}
-            <a href="#" className="text-[#016B61] hover:underline font-medium">
+            <a href="/login" className="text-[#8c5d36] hover:underline font-semibold">
               Sign in here
             </a>
           </p>

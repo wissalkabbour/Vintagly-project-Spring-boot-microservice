@@ -32,7 +32,7 @@ app:
   keycloak:
     admin:
       clientId: backend
-      clientSecret: TmUl7oedikL82hIqLEpcbShay1eX18pZ
+      clientSecret: X5X2G9FkUWZ0esrG1AXzJaSKbiR6FKYY
     realm: myrealm
     serverUrl: http://localhost:8080
 
