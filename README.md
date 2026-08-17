@@ -1,4 +1,4 @@
-Vintagly — Vintage Marketplace
+Vintagly : Vintage Marketplace
 Overview :
 
 Vintagly is a web platform dedicated to lovers of vintage and second-hand objects.
